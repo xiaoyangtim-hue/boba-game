@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>手搖飲挑戰.io</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FFF6E5;--line:rgba(110,70,40,.2);--ink:#4A2C1A;--ink2:#8A6A55;--orange:#FF8A3D;--yellow:#FFC24B;--pink:#FF7A93;--green:#5DB36B;--red:#E5484D;--gold:#F5A623;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{scroll-padding-top:env(safe-area-inset-top,0px);overscroll-behavior:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+input{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+button{touch-action:manipulation}
+body{margin:0;min-height:100%;background:radial-gradient(rgba(255,138,61,.16) 1.5px,transparent 1.5px) 0 0/22px 22px,var(--bg);color:var(--ink);font-family:'Noto Sans TC',sans-serif;display:flex;justify-content:center;overflow-x:hidden}
+body.playing{position:fixed;inset:0;overflow:hidden;overscroll-behavior:none;touch-action:none}
+.stage{width:100%;max-width:420px}
+.overlay{position:fixed;inset:0;background:radial-gradient(rgba(255,138,61,.16) 1.5px,transparent 1.5px) 0 0/22px 22px,var(--bg);display:flex;padding:14px;z-index:30;overflow-y:auto;overscroll-behavior:contain}
+.overlay.hidden{display:none}
+.panel{background:#fff;border:2px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 16px;max-width:360px;width:100%;text-align:center;margin:auto}
+.logo{display:flex;flex-direction:column;align-items:center;gap:2px}
+.wordmark{display:flex;align-items:center;gap:6px}
+.w1{font-weight:900;font-size:2.1rem;color:var(--orange);text-shadow:2px 3px 0 var(--ink);letter-spacing:1px}
+.io{background:var(--yellow);border:2px solid var(--ink);border-radius:10px;padding:0 8px;font-family:'Baloo 2';font-weight:800;font-size:1.3rem;transform:rotate(-5deg)}
+.tag{font-size:.8rem;color:var(--ink2);font-weight:500}
+h2{margin:0 0 6px;color:var(--orange);font-weight:900;font-size:1.3rem}
+.howto{text-align:left;background:#FFF9EC;border:2px dashed var(--line);border-radius:14px;padding:10px 12px;font-size:.78rem;line-height:1.55;margin:10px 0}
+.howto h3{margin:0 0 4px;font-size:.92rem;color:var(--orange)}
+.howto ol{margin:0;padding-left:18px}.howto li{margin-bottom:3px}.howto p{margin:5px 0 0;color:var(--ink2)}
+.sec{font-size:.78rem;font-weight:900;text-align:left;margin:10px 0 5px}
+.avrow{display:flex;gap:10px;align-items:center}
+.avprev{flex-shrink:0;width:64px;height:64px;border-radius:50%;background:#fff;border:6px solid var(--orange);outline:2px solid var(--ink);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.avgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;flex:1}
+.avgrid button{aspect-ratio:1;border:2px solid var(--line);border-radius:10px;background:#fff;font-size:1.2rem;cursor:pointer;padding:0}
+.avgrid button.sel{border-color:var(--ink);background:var(--yellow)}
+.colors{display:flex;gap:8px;margin:8px 0 6px;justify-content:center}
+.colors button{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);cursor:pointer;padding:0}
+.colors button.sel{border:3px solid var(--ink);transform:scale(1.15)}
+.diff{display:flex;gap:6px}
+.diff button{flex:1;padding:8px 0;border:2px solid var(--ink);border-radius:12px;background:#fff;font-weight:900;font-size:.9rem;color:var(--ink);cursor:pointer;font-family:inherit}
+.diff button.sel.easy{background:#A8E6B0;box-shadow:0 3px 0 var(--ink)}.diff button.sel.normal{background:var(--yellow);box-shadow:0 3px 0 var(--ink)}.diff button.sel.hard{background:#FFA3B5;box-shadow:0 3px 0 var(--ink)}
+.diffdesc{font-size:.74rem;color:var(--ink2);margin:6px 0 8px}
+.coinline{font-weight:900;color:var(--gold);margin:4px 0}
+.nick{width:100%;padding:10px;border-radius:12px;border:2px solid var(--ink);background:#fff;color:var(--ink);text-align:center;margin-bottom:10px;font-size:.92rem;font-family:inherit}
+.bigbtn{width:100%;padding:11px;border:2px solid var(--ink);border-radius:14px;font-family:inherit;font-weight:900;font-size:1rem;cursor:pointer;margin-bottom:9px;box-shadow:0 4px 0 var(--ink)}
+.bigbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.bigbtn.go{background:var(--green);color:#fff}.bigbtn.alt{background:#fff;color:var(--ink)}
+.shop-item{display:flex;justify-content:space-between;align-items:center;gap:8px;background:#FFF9EC;border:2px solid var(--line);border-radius:12px;padding:8px 10px;margin-bottom:7px;text-align:left}
+.shop-item .d{font-size:.8rem;font-weight:900}.shop-item .d small{display:block;color:var(--ink2);font-size:.7rem;font-weight:500}
+.pips{color:var(--orange);letter-spacing:1px;font-size:.7rem}
+.buy{border:2px solid var(--ink);border-radius:10px;padding:6px 9px;font-weight:900;font-size:.76rem;background:var(--yellow);color:var(--ink);cursor:pointer;flex-shrink:0;font-family:inherit;white-space:nowrap}
+.buy.owned{background:#A8E6B0}.buy:disabled:not(.owned){opacity:.4}
+.backlink{background:none;border:none;color:var(--ink2);font-size:.8rem;text-decoration:underline;cursor:pointer}
+.lbbox{text-align:left;font-size:.8rem;line-height:1.6;background:#FFF9EC;border-radius:12px;padding:8px 12px;margin:8px 0;max-height:170px;overflow-y:auto}
+#gameWrap{display:none;position:fixed;top:0;bottom:0;left:50%;width:100%;max-width:480px;transform:translateX(-50%);flex-direction:column;gap:6px;padding:calc(12px + env(safe-area-inset-top,0px)) 10px calc(8px + env(safe-area-inset-bottom,0px))}
+.hud{display:flex;gap:6px;flex-wrap:wrap;justify-content:space-between}
+.chip{background:#fff;border:2px solid var(--ink);border-radius:999px;padding:3px 10px;font-weight:900;font-size:.82rem}
+.chip.hot{background:var(--yellow)}.chip.low{background:#FFD6D6;color:var(--red)}
+.power{border:2px solid var(--ink);border-radius:999px;padding:3px 10px;font-weight:900;font-size:.78rem;background:var(--yellow);color:var(--ink);cursor:pointer;font-family:inherit}
+.power:disabled{opacity:.4}
+.ordercard{background:#fff;border:2px solid var(--ink);border-radius:14px;padding:5px 10px}
+.ordercard.vip{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,166,35,.4)}
+.oname{font-weight:900;font-size:.92rem}.vipt{background:var(--gold);border-radius:8px;padding:0 6px;font-size:.7rem}
+.pill{display:inline-block;border-radius:999px;padding:0 8px;font-size:.72rem;font-weight:700;margin:2px 3px 0 0;border:1.5px solid var(--line);color:var(--ink2);background:#fff}
+.pill.ok{background:#DDF5E0;border-color:var(--green);color:#2E7D3A}.pill.bad{background:#FFE1E1;border-color:var(--red);color:var(--red)}
+.cwrap{flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center;touch-action:none}
+canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#FFF9EE;pointer-events:none}
+.hint{position:absolute;left:50%;top:26px;transform:translateX(-50%);background:var(--yellow);border:2px solid var(--ink);font-weight:900;font-size:.78rem;padding:3px 10px;border-radius:10px;pointer-events:none;display:none;max-width:96%;text-align:center}
+.jbase{position:absolute;width:100px;height:100px;margin:-50px 0 0 -50px;border-radius:50%;background:rgba(255,255,255,.6);border:2px solid var(--ink);display:none;pointer-events:none}
+.jknob{position:absolute;left:27px;top:27px;width:42px;height:42px;border-radius:50%;background:var(--orange);border:2px solid var(--ink)}
+.infobar{display:flex;gap:6px}
+.cupbar,.lblive{background:#fff;border:2px solid var(--ink);border-radius:12px;padding:3px 8px;font-size:.7rem;font-weight:700;line-height:1.45}
+.cupbar{flex:1}.lblive{text-align:right;min-width:92px}
+.ph{display:inline-block;border-radius:8px;padding:0 6px;margin-right:3px;border:1.5px solid var(--line);color:var(--ink2)}
+.ph.on{background:var(--yellow);border-color:var(--ink);color:var(--ink)}
+.btns{display:flex;gap:8px}
+.actbtn{height:50px;border-radius:14px;border:2px solid var(--ink);font-weight:900;font-size:.85rem;cursor:pointer;box-shadow:0 4px 0 var(--ink);font-family:inherit}
+.actbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.actbtn.go{flex:1.7;background:var(--orange);color:#fff;font-size:.95rem}.actbtn.dis{flex:1.2;background:#fff;color:var(--red)}.actbtn.rm{flex:1;background:#fff;color:var(--ink)}
+
+.rules{margin:10px 0 0;text-align:left}
+.rules details{background:#FFF9EC;border:2px solid var(--line);border-radius:12px;margin-bottom:6px;overflow:hidden}
+.rules summary{font-weight:900;font-size:.82rem;padding:8px 10px;cursor:pointer;list-style:none}
+.rules summary::-webkit-details-marker{display:none}
+.rules summary::after{content:'＋';float:right;color:var(--orange)}
+.rules details[open] summary::after{content:'－'}
+.rules details[open]{border-color:var(--ink)}
+.rb{padding:0 12px 10px;font-size:.76rem;line-height:1.6}
+.rb p{margin:4px 0}.rb ul{margin:4px 0;padding-left:16px}
+.rb table{width:100%;border-collapse:collapse;font-size:.72rem;margin:4px 0}
+.rb td,.rb th{border:1px solid var(--line);padding:3px 4px;text-align:center;background:#fff}
+.rb th{background:var(--yellow)}
+.hud,.ordercard,.infobar,.btns{flex-shrink:0}
+#timerChip{font-size:1rem;min-width:84px;text-align:center}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="overlay" id="startOverlay">
+ <div class="panel" id="startPanel">
+  <div class="logo">
+   <svg viewBox="0 0 120 120" width="84" height="84" aria-label="手搖飲標誌">
+    <rect x="64" y="4" width="9" height="42" rx="4" fill="#FF7A93" stroke="#4A2C1A" stroke-width="3" transform="rotate(14 68 26)"/>
+    <path d="M30 40H90L82 106Q81 112 75 112H45Q39 112 38 106Z" fill="#FFF3DC" stroke="#4A2C1A" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M34 62H86L82 104Q81.5 108 76 108H44Q38.5 108 38 104Z" fill="#FFB85C"/>
+    <rect x="26" y="32" width="68" height="12" rx="6" fill="#FF8A3D" stroke="#4A2C1A" stroke-width="4"/>
+    <circle cx="48" cy="98" r="6" fill="#4A2C1A"/><circle cx="62" cy="100" r="6" fill="#4A2C1A"/><circle cx="73" cy="95" r="6" fill="#4A2C1A"/><circle cx="55" cy="88" r="5" fill="#4A2C1A"/>
+   </svg>
+   <div class="wordmark"><span class="w1">手搖飲挑戰</span><span class="io">.io</span></div>
+   <div class="tag">限時調飲・搶業績的手搖店遊戲</div>
+  </div>
+  <div class="howto">
+   <h3>📖 遊戲玩法</h3>
+   <ol>
+    <li><b>看訂單</b>：上方顯示客人點的飲料和配方，例如「珍珠奶茶：茶×2、奶×1、珍珠×2、半糖、少冰」。</li>
+    <li><b>①先加料</b>：走到 🍵🥛🧋🍋🥭🍊🍓🍍🥝🍬🧊 旁按「互動」加一份。每種水果都有自己的工作站，份數要剛剛好，沒列出的材料不能加。小心地圖上混著幾個<b>陷阱材料</b>，碰到杯子就髒了！</li>
+    <li><b>②再搖</b>：到 🥤 搖酒器搖滿指定次數。<b>搖過就不能再加料</b>，加錯只能重做。</li>
+    <li><b>③最後交件</b>：到 🛎️ 櫃檯按互動。全對 = 高分＋加時間，亂做會扣分。</li>
+    <li><b>倒數計時</b>：時間歸零就結束，越多杯完美越能延長時間！</li>
+   </ol>
+   <p>🧹 加錯了？簡單可「清空」一種材料、中等可「取出一份」（扣 3 秒）、困難只能整杯丟棄。</p>
+   <p>🎮 電腦：WASD／方向鍵移動、空白鍵互動、Q 取出、R 丟棄。📱 手機：手指按在地圖任何地方拖曳就是搖桿，右下按鈕互動。</p>
+   <p>⭐ 發光的 VIP 訂單雙倍分數　🔥 連續完美有連擊加分　🪙 分數換成金幣，可到商店升級　🤖 場上有兩位 AI 對手搶業績。</p>
+  </div>
+  <div class="rules">
+   <div class="sec" style="margin-top:0">📜 詳細規則（點標題展開）</div>
+   <details><summary>📋 怎麼看訂單</summary><div class="rb">
+    <p>訂單最上面是飲料名稱，下面的小標籤是<b>配方</b>：「🍵茶 ×2」代表要<b>剛好</b>加 2 份茶，不多也不少。水果也一樣要加對種類：🥭芒果、🍊柳橙、🍓草莓、🍍鳳梨、🥝奇異果各有各的工作站。另外還有三個固定項目：甜度、冰量、要搖幾下。</p>
+    <ul><li>標籤變<b>綠色</b> = 這項你杯子裡已經正確；沒變色 = 還沒做對。</li>
+    <li>紅色的「✖不要○○」= 你加了訂單上沒有的材料。配方沒列出的材料一律是 0 份，不能加。</li>
+    <li>甜度要按幾下：無糖 0、三分 1、五分 2、七分 3、全糖 4。冰量：去冰 0、微冰 1、少冰 2、正常冰 3。</li>
+    <li>杯子一開始就是「無糖、去冰」，所以點無糖或去冰的訂單不用按。</li>
+    <li>簡單模式客人只會點 無糖／五分糖／全糖，以及 去冰／少冰／正常冰。</li></ul>
+   </div></details>
+   <details><summary>🛠️ 製作步驟（順序很重要）</summary><div class="rb">
+    <ul><li><b>①加料</b>：走到工作站旁（圈圈變橘色，上方出現黑色提示），按「互動」一次加一份；糖和冰是一次加一級。</li>
+    <li><b>②搖</b>：材料都對了，再到 🥤 搖酒器，按一次搖一下，搖到指定次數。簡單／中等搖得比要求多也可以；困難只能搖「要求次數～多 2 次」，例如 5～7 下。</li>
+    <li><b>③交件</b>：搖完到 🛎️ 櫃檯按互動。</li></ul>
+    <p>⚠️ 搖過之後<b>不能再加料</b>；空杯子不能搖，也不能交件。要搖的次數會越來越多：每交 3 杯多 1 下，最多多 3 下。</p>
+   </div></details>
+   <details><summary>🧮 計分與時間</summary><div class="rb">
+    <p>每杯飲料會檢查：訂單上列出的<b>每一種材料份數</b>、甜度、冰量、搖的次數。另外加了「訂單沒有」的材料，每多一種就倒扣一項正確。</p>
+    <table><tr><th>結果</th><th>條件</th><th>得分</th><th>時間</th></tr>
+    <tr><td>⚡完美</td><td>全部正確、沒多加</td><td>(25＋連擊數×3)×難度倍率</td><td>＋5～7 秒</td></tr>
+    <tr><td>普通</td><td>答對 6 成以上</td><td>每項 3 分×難度倍率</td><td>＋1 秒，連擊歸零</td></tr>
+    <tr><td>太馬虎</td><td>不到 6 成，或杯子被污染</td><td>−5 分</td><td>連擊歸零</td></tr></table>
+    <ul><li>難度倍率：簡單 ×1、中等 ×1.3、困難 ×1.7。完美的加時：簡單 7 秒、中等 6 秒、困難 5 秒。</li>
+    <li>時間歸零遊戲就結束；剩餘時間最多只能比開局多 30 秒。畫面上方有綠色倒數條，剩 10 秒會變紅。</li></ul>
+   </div></details>
+   <details><summary>🔥 連擊、VIP 與難度</summary><div class="rb">
+    <ul><li><b>連擊</b>：連續完美出餐，連擊數越高每杯加分越多；只要有一杯不是完美就歸零。連擊數是 5 的倍數時會亮黃色。</li>
+    <li><b>⭐VIP</b>：每交滿 5 杯，下一杯就是 VIP，訂單會發光。分數 ×2，完美再多加 2 秒。</li>
+    <li><b>難度</b>：簡單 75 秒、中等 60 秒、困難 45 秒。簡單只出 4 種基本款，中等多 5 種進階款，困難再加 5 種複雜配方（含多種水果混搭），AI 也更強。</li></ul>
+   </div></details>
+   <details><summary>🧹 加錯了怎麼辦</summary><div class="rb">
+    <ul><li><b>🗑 整杯丟棄</b>：全部重做。所有難度、任何時候都能用，不扣分也不扣時間（電腦按 R）。</li>
+    <li><b>簡單「🧹清空」</b>：走到那種材料旁邊按，把那一種全部清掉，免費。</li>
+    <li><b>中等「➖取出」</b>：走到那種材料旁邊按，取出一份，扣 3 秒。</li>
+    <li><b>困難</b>：沒有取出功能，只能整杯丟棄。</li>
+    <li>搖過之後，所有難度都只能整杯丟棄。</li></ul>
+   </div></details>
+   <details><summary>☠️ 陷阱材料</summary><div class="rb">
+    <p>地圖上除了真正的材料，還混著幾個<b>陷阱材料</b>，它們不在任何配方裡。杯子裡只要有一個陷阱材料，這杯就是「污染」，交件直接算太馬虎（−5 分、連擊歸零）。</p>
+    <table><tr><th>難度</th><th>數量</th><th>長相</th></tr>
+    <tr><td>簡單</td><td>1 個</td><td>🧂鹽巴，圈圈是紅色虛線，標示 ⚠️</td></tr>
+    <tr><td>中等</td><td>3 個</td><td>🧂鹽巴、🥥椰奶、🍯蜂蜜，<b>沒有警告標示</b>，長得像牛奶和糖</td></tr>
+    <tr><td>困難</td><td>6 個</td><td>再加 🍈哈密瓜、🍑水蜜桃、🌶️辣椒醬，很容易跟水果搞混</td></tr></table>
+    <p>陷阱的位置每局都不一樣，走近時上方提示會顯示它的名字。誤碰了怎麼辦：簡單可「清空」、中等可「取出」（扣 3 秒）、困難只能整杯丟棄。</p>
+   </div></details>
+   <details><summary>🪙 金幣、商店與 AI 對手</summary><div class="rb">
+    <ul><li>每局結束，分數 1:1 換成金幣，存在這個裝置上。</li>
+    <li>商店有 8 種升級，最高 5 級（部分 3 級），每一級的效果都很小，慢慢累積。</li>
+    <li>遊戲中也能花 30 金幣買「＋10 秒」（商店升級後更便宜）。</li>
+    <li>場上兩位 🤖 AI 只是陪你比分數，會自己慢慢累積業績，不會影響你的得分；畫面下方的即時排行榜可以看誰領先。</li>
+    <li>結束後成績會進前十名排行榜（目前只存在這個裝置，雲端共用版需要另外設定）。</li></ul>
+   </div></details>
+   <details><summary>🎮 操作方式</summary><div class="rb">
+    <ul><li><b>電腦</b>：WASD／方向鍵移動、空白鍵互動、Q 取出／清空、R 整杯丟棄。</li>
+    <li><b>手機</b>：手指按在地圖任何地方拖曳就是搖桿（按哪裡就在哪裡出現）。右下三個按鈕：取出／清空、整杯丟棄、互動。</li></ul>
+   </div></details>
+  </div>
+  <div class="sec">你的頭像</div>
+  <div class="avrow"><div class="avprev" id="avPrev">🧑‍🍳</div><div class="avgrid" id="avGrid"></div></div>
+  <div class="colors" id="avColors"></div>
+  <input class="nick" id="avCustom" maxlength="8" placeholder="想用別的表情？輸入或貼上一個 emoji">
+  <div class="sec">選擇難度</div>
+  <div class="diff" id="diffRow"><button data-d="easy" class="easy">簡單</button><button data-d="normal" class="normal">中等</button><button data-d="hard" class="hard">困難</button></div>
+  <p class="diffdesc" id="diffDesc"></p>
+  <div class="coinline">🪙 金幣：<span id="coinDisplay">0</span></div>
+  <input class="nick" id="nickInput" maxlength="10" placeholder="輸入你的暱稱">
+  <button class="bigbtn go" id="startBtn">開始上工</button>
+  <button class="bigbtn alt" id="shopBtnStart">🛍️ 商店</button>
+ </div>
+ <div class="panel" id="shopPanel" style="display:none">
+  <h2>🛍️ 商店</h2><div class="coinline">🪙 金幣：<span id="coinDisplay2">0</span></div>
+  <div id="shopList"></div><button class="backlink" id="shopBack">← 返回</button>
+ </div>
+ <div class="panel" id="endPanel" style="display:none">
+  <h2>⏰ 時間到！</h2>
+  <div style="font-size:.8rem;color:var(--ink2)">難度：<span id="endDiff"></span>　本局得分</div>
+  <div style="font-weight:900;font-size:2.4rem" id="finalScore">0</div>
+  <div class="coinline">已換成 <span id="coinGain">0</span> 金幣</div>
+  <div class="lbbox" id="lbTop10"></div>
+  <button class="bigbtn go" id="restartBtn">再上工一次</button>
+  <button class="bigbtn alt" id="endShopBtn">🛍️ 商店</button>
+ </div>
+</div>
+
+<div id="gameWrap">
+ <div class="hud">
+  <div class="chip" id="timerChip">⏱ 60</div><div class="chip">💰 <span id="scoreChip">0</span></div>
+  <div class="chip" id="comboChip">x0</div><button class="power" id="powerBtn">🪙+10秒(30)</button>
+ </div>
+ <div class="ordercard" id="orderCard"></div>
+ <div class="cwrap" id="cwrap"><canvas id="canvas"></canvas><div class="hint" id="hint"></div><div class="jbase" id="jBase"><div class="jknob" id="jKnob"></div></div></div>
+ <div class="infobar"><div class="cupbar" id="cupBar"></div><div class="lblive" id="lbLive"></div></div>
+ <div class="btns"><button class="actbtn rm" id="rmBtn">➖取出</button><button class="actbtn dis" id="discardBtn">🗑 整杯丟棄</button><button class="actbtn go" id="actBtn">👆 互動</button></div>
+</div>
+</div>
+
+<script>
+(function(){
+const W=320,H=400,el=id=>document.getElementById(id),pick=a=>a[Math.floor(Math.random()*a.length)];
+const cvs=el('canvas'),ctx=cvs.getContext('2d'),DPR=Math.min(2,window.devicePixelRatio||1);
+cvs.width=W*DPR;cvs.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
+function fit(){const b=el('cwrap').getBoundingClientRect();if(b.width<10||b.height<10)return;const s=Math.min(b.width/W,b.height/H);cvs.style.width=W*s+'px';cvs.style.height=H*s+'px'}
+window.addEventListener('resize',fit);window.addEventListener('orientationchange',()=>setTimeout(fit,200));
+const REAL_STATIONS=[
+ {id:'tea',x:32,y:45,e:'🍵',n:'茶',c:'#FFC98B'},{id:'milk',x:96,y:45,e:'🥛',n:'牛奶',c:'#FFF1D8'},{id:'sugar',x:160,y:45,e:'🍬',n:'糖',c:'#FFC4D6'},{id:'ice',x:224,y:45,e:'🧊',n:'冰塊',c:'#C5E8FF'},{id:'boba',x:288,y:45,e:'🧋',n:'珍珠',c:'#E3CDB4'},
+ {id:'lemon',x:32,y:120,e:'🍋',n:'檸檬',c:'#FFF08A'},{id:'mango',x:96,y:120,e:'🥭',n:'芒果',c:'#FFC07A'},{id:'orange',x:160,y:120,e:'🍊',n:'柳橙',c:'#FFB45C'},{id:'strawberry',x:224,y:120,e:'🍓',n:'草莓',c:'#FFA5B5'},{id:'pineapple',x:288,y:120,e:'🍍',n:'鳳梨',c:'#FFE27A'},
+ {id:'kiwi',x:32,y:195,e:'🥝',n:'奇異果',c:'#C8E6A0'},{id:'shaker',x:288,y:195,e:'🥤',n:'搖酒器',c:'#CCD8FF'},{id:'counter',x:160,y:350,e:'🛎️',n:'交件櫃檯',c:'#BDEBC6'}
+];
+let STATIONS=REAL_STATIONS.slice();
+const FREE_SLOTS=[[96,195],[160,195],[224,195],[32,270],[96,270],[160,270],[224,270],[288,270]];
+const ING={tea:['🍵','茶'],milk:['🥛','奶'],boba:['🧋','珍珠'],lemon:['🍋','檸檬'],mango:['🥭','芒果'],orange:['🍊','柳橙'],strawberry:['🍓','草莓'],pineapple:['🍍','鳳梨'],kiwi:['🥝','奇異果']};
+const TRAPS={salt:{e:'🧂',n:'鹽巴',c:'#EDEDED'},coconut:{e:'🥥',n:'椰奶',c:'#F2EBDD'},honey:{e:'🍯',n:'蜂蜜',c:'#FFD98A'},melon:{e:'🍈',n:'哈密瓜',c:'#CDEFA8'},peach:{e:'🍑',n:'水蜜桃',c:'#FFC9B8'},chili:{e:'🌶️',n:'辣椒醬',c:'#FFB0A8'}};
+const ING_KEYS=Object.keys(ING),TRAP_KEYS=Object.keys(TRAPS);
+const LBL={sugar:'糖',ice:'冰塊'};
+const SUGAR_LB=['無糖','三分糖','五分糖','七分糖','全糖'],ICE_LB=['去冰','微冰','少冰','正常冰'];
+const MENU=[
+ {n:'四季春青茶',e:'🍃',t:1,r:{tea:3}},{n:'檸檬綠茶',e:'🍋',t:1,r:{tea:2,lemon:1}},{n:'紅茶拿鐵',e:'☕',t:1,r:{tea:1,milk:2}},{n:'珍珠奶茶',e:'🧋',t:1,r:{tea:2,milk:1,boba:2}},
+ {n:'波霸鮮奶茶',e:'🥛',t:2,r:{tea:1,milk:3,boba:2}},{n:'芒果綠茶',e:'🥭',t:2,r:{tea:2,mango:2}},{n:'柳橙綠茶',e:'🍊',t:2,r:{tea:2,orange:1,lemon:1}},{n:'草莓鮮奶',e:'🍓',t:2,r:{milk:2,strawberry:2}},{n:'奇異果綠茶',e:'🥝',t:2,r:{tea:2,kiwi:2}},
+ {n:'草莓奶蓋茶',e:'🍓',t:3,r:{tea:2,milk:1,strawberry:2,boba:1}},{n:'雙珍奶茶',e:'🧋',t:3,r:{tea:2,milk:2,boba:3}},{n:'綜合水果茶',e:'🍹',t:3,r:{tea:1,orange:1,pineapple:1,kiwi:1,lemon:1}},{n:'楊枝甘露',e:'🥭',t:3,r:{milk:2,mango:3,boba:1}},{n:'鳳梨檸檬冰茶',e:'🍍',t:3,r:{tea:2,pineapple:2,lemon:2}}
+];
+const DIFFS={
+ easy:{label:'簡單',time:75,shake:3,bonus:7,mult:1,ai:.5,tiers:[1],rm:'🧹清空',traps:['salt'],flag:true,desc:'75 秒・配方單純・1 個有警告標示的陷阱材料・加錯可「清空」一種材料・得分 ×1'},
+ normal:{label:'中等',time:60,shake:4,bonus:6,mult:1.3,ai:.8,tiers:[1,2],rm:'➖取出',traps:['salt','coconut','honey'],flag:false,desc:'60 秒・配方更多樣・3 個沒標示的陷阱材料・可「取出一份」但扣 3 秒・得分 ×1.3'},
+ hard:{label:'困難',time:45,shake:5,bonus:5,mult:1.7,ai:1.1,tiers:[1,2,3],rm:'',traps:['salt','coconut','honey','melon','peach','chili'],flag:false,desc:'45 秒・複雜配方・6 個容易混淆的陷阱材料・加錯只能整杯重做・搖太多也算錯・得分 ×1.7'}
+};
+// 商店：每級效果都很小，最高 5 級（部分 3 級）
+const SHOP_ITEMS=[
+ {id:'fastFeet',icon:'🏃',name:'靈活腳步',max:5,base:30,eff:l=>`移動速度 +${l*6}%`},
+ {id:'reach',icon:'🧲',name:'長手臂',max:5,base:30,eff:l=>`互動距離 +${l*3}`},
+ {id:'moreTime',icon:'⏱️',name:'熱身時間',max:5,base:35,eff:l=>`開局多 ${l*3} 秒`},
+ {id:'timeBonus',icon:'⏳',name:'加時達人',max:5,base:40,eff:l=>`完美出餐多加 ${l*.5} 秒`},
+ {id:'coinBoost',icon:'💰',name:'黃金比例',max:5,base:45,eff:l=>`所有得分 +${l*4}%`},
+ {id:'portion',icon:'🧋',name:'豐盛配料',max:5,base:40,eff:l=>`完美時每份材料 +${(l*.2).toFixed(1)} 分`},
+ {id:'headStart',icon:'🔥',name:'職人手感',max:3,base:60,eff:l=>`開局連擊 x${l}`},
+ {id:'powerDisc',icon:'🪙',name:'加時折扣',max:3,base:50,eff:l=>`「+10秒」只要 ${30-l*5} 金幣`}
+];
+const AV_EMOJI=['🧑‍🍳','👩‍🍳','👨‍🍳','🐱','🐶','🐰','🦊','🐼','🐸','🐻','🐯','🦄'];
+const AV_COLOR=['#FF8A3D','#FF7A93','#5DB36B','#4DA3FF','#B98CFF','#FFC24B'];
+let coins=0,upgrades={},diff='normal',playerName='玩家',gameOverOnce=false,av={e:'🧑‍🍳',c:'#FF8A3D'};
+const lv=id=>{const v=upgrades[id];return v===true?1:Math.max(0,parseInt(v||0,10)||0)};
+const powerCost=()=>30-5*lv('powerDisc'),reach=()=>32+3*lv('reach');
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function g1(s){s=(s||'').trim();if(!s)return'';try{for(const x of new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(s))return x.segment}catch(e){}return Array.from(s)[0]||''}
+function loadSave(){
+ try{coins=parseInt(localStorage.getItem('mtCoins')||'0',10)||0}catch(e){}
+ try{upgrades=JSON.parse(localStorage.getItem('mtUpgrades')||'{}')}catch(e){}
+ try{const d=localStorage.getItem('mtDiff');if(DIFFS[d])diff=d}catch(e){}
+ try{const a=JSON.parse(localStorage.getItem('mtAvatar')||'null');if(a&&a.e&&a.c)av=a}catch(e){}
+ showCoins();
+}
+function showCoins(){el('coinDisplay').textContent=coins;el('coinDisplay2').textContent=coins}
+function saveCoins(){try{localStorage.setItem('mtCoins',String(coins))}catch(e){}showCoins();updPower()}
+function saveUpg(){try{localStorage.setItem('mtUpgrades',JSON.stringify(upgrades))}catch(e){}}
+
+function renderAvatar(){
+ const p=el('avPrev');p.textContent=av.e;p.style.borderColor=av.c;
+ const g=el('avGrid');g.innerHTML='';
+ AV_EMOJI.forEach(x=>{const b=document.createElement('button');b.textContent=x;b.className=x===av.e?'sel':'';b.onclick=()=>{av.e=x;el('avCustom').value='';saveAv();renderAvatar()};g.appendChild(b)});
+ const c=el('avColors');c.innerHTML='';
+ AV_COLOR.forEach(x=>{const b=document.createElement('button');b.style.background=x;b.className=x===av.c?'sel':'';b.onclick=()=>{av.c=x;saveAv();renderAvatar()};c.appendChild(b)});
+}
+function saveAv(){try{localStorage.setItem('mtAvatar',JSON.stringify(av))}catch(e){}}
+el('avCustom').addEventListener('input',e=>{const x=g1(e.target.value);if(x){av.e=x;e.target.value=x;saveAv();el('avPrev').textContent=x;el('avGrid').querySelectorAll('button').forEach(b=>b.classList.remove('sel'))}});
+
+function renderDiff(){
+ document.querySelectorAll('#diffRow button').forEach(b=>b.classList.toggle('sel',b.dataset.d===diff));
+ el('diffDesc').textContent=DIFFS[diff].desc;
+}
+document.querySelectorAll('#diffRow button').forEach(b=>b.onclick=()=>{diff=b.dataset.d;try{localStorage.setItem('mtDiff',diff)}catch(e){}renderDiff()});
+
+function renderShop(){
+ const list=el('shopList');list.innerHTML='';
+ SHOP_ITEMS.forEach(it=>{
+  const L=lv(it.id),maxed=L>=it.max,cost=Math.round(it.base*(1+.45*L)),row=document.createElement('div');row.className='shop-item';
+  row.innerHTML=`<div class="d">${it.icon} ${it.name} <span class="pips">${'●'.repeat(L)}${'○'.repeat(it.max-L)}</span><small>目前：${L?it.eff(L):'尚未升級'}${maxed?'':'　→ 下一級：'+it.eff(L+1)}</small></div>`;
+  const b=document.createElement('button');b.className='buy'+(maxed?' owned':'');b.textContent=maxed?'已滿級':`Lv.${L+1} 🪙${cost}`;b.disabled=maxed||coins<cost;
+  b.onclick=()=>{if(maxed||coins<cost)return;coins-=cost;upgrades[it.id]=L+1;saveCoins();saveUpg();renderShop()};
+  row.appendChild(b);list.appendChild(row);
+ });
+}
+el('shopBtnStart').onclick=()=>{el('startPanel').style.display='none';el('shopPanel').style.display='block';renderShop()};
+el('endShopBtn').onclick=()=>{el('endPanel').style.display='none';el('shopPanel').style.display='block';renderShop()};
+el('shopBack').onclick=()=>{el('shopPanel').style.display='none';el(gameOverOnce?'endPanel':'startPanel').style.display='block'};
+
+// ---- 排行榜：本機備援 + Firebase Firestore（填入 FIREBASE_PROJECT_ID 就會變成跨裝置共用）----
+const FIREBASE_PROJECT_ID='';
+let localLB=[];
+try{localLB=JSON.parse(localStorage.getItem('mtLeaderboard')||'[]')}catch(e){}
+const fsBase=()=>`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
+async function fbAddScore(name,sc,d,a){
+ try{
+  const r=await fetch(fsBase()+'/scores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{
+   name:{stringValue:String(name).slice(0,20)},score:{integerValue:String(sc)},diff:{stringValue:d},av:{stringValue:a},ts:{integerValue:String(Date.now())}}})});
+  return r.ok;
+ }catch(e){return false}
+}
+async function fbGetTop10(){
+ try{
+  const r=await fetch(fsBase()+':runQuery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{
+   from:[{collectionId:'scores'}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:10}})});
+  if(!r.ok)return null;
+  const data=await r.json();
+  return data.filter(d=>d.document&&d.document.fields).map(d=>{const f=d.document.fields;
+   return{name:(f.name&&f.name.stringValue)||'?',score:parseInt((f.score&&f.score.integerValue)||'0',10),diff:(f.diff&&f.diff.stringValue)||'',av:(f.av&&f.av.stringValue)||''}});
+ }catch(e){return null}
+}
+function renderTop10(list,label){
+ const rows=(list&&list.length)?list.slice(0,10).map((r,i)=>`#${i+1} ${esc(r.av||'')} ${esc(r.name)} — ${r.score} 分${DIFFS[r.diff]?' ['+DIFFS[r.diff].label+']':''}`).join('<br>'):'還沒有紀錄';
+ el('lbTop10').innerHTML=`<b>${label}</b><br>${rows}`;
+}
+
+// ---- 遊戲狀態 ----
+let playing=false,busy=false,player={x:160,y:270,r:15},keys={},joyVec={x:0,y:0},joyEnd=()=>{};
+let startTime=60,cup,order,deliveries=0,combo=0,score=0,timeLeft=60,maxTime=90,timerId=null,ai=[];
+function resetCup(){cup={sugar:0,ice:0,shakes:0};ING_KEYS.concat(TRAP_KEYS).forEach(k=>cup[k]=0);renderCup();if(order)renderOrder()}
+function shakeOk(){const n=order.shakes;return cup.shakes>=n&&(diff!=='hard'||cup.shakes<=n+2)}
+const hasMat=()=>ING_KEYS.concat(TRAP_KEYS).some(k=>cup[k]>0)||cup.sugar>0||cup.ice>0;
+function newOrder(){
+ const D=DIFFS[diff],m=pick(MENU.filter(x=>D.tiers.includes(x.t)));
+ order={m,r:Object.assign(Object.fromEntries(ING_KEYS.map(k=>[k,0])),m.r),
+  sugar:pick(diff==='easy'?[0,2,4]:[0,1,2,3,4]),ice:pick(diff==='easy'?[0,2,3]:[0,1,2,3]),
+  shakes:D.shake+Math.min(3,Math.floor(deliveries/3))+Math.floor(Math.random()*2),vip:deliveries>0&&deliveries%5===0};
+ renderOrder();
+}
+const pill=(t,c)=>`<span class="pill ${c}">${t}</span>`;
+function renderOrder(){
+ const c=el('orderCard');c.classList.toggle('vip',order.vip);
+ let h=`<div class="oname">${order.vip?'<span class="vipt">⭐VIP 雙倍</span> ':''}${order.m.e} ${order.m.n}</div>`;
+ ING_KEYS.forEach(k=>{
+  if(order.r[k]>0)h+=pill(`${ING[k][0]}${ING[k][1]} ×${order.r[k]}`,cup[k]===order.r[k]?'ok':'');
+  else if(cup[k]>0)h+=pill(`✖不要${ING[k][1]}`,'bad');
+ });
+ TRAP_KEYS.forEach(k=>{if(cup[k]>0)h+=pill(`☠️污染：${TRAPS[k].n}`,'bad')});
+ h+=pill('🍬'+SUGAR_LB[order.sugar],cup.sugar===order.sugar?'ok':'')+pill('🧊'+ICE_LB[order.ice],cup.ice===order.ice?'ok':'')
+  +pill(`🥤搖${order.shakes}${diff==='hard'?'~'+(order.shakes+2):''}下`,shakeOk()?'ok':'');
+ c.innerHTML=h;
+}
+function renderCup(){
+ const ph=cup.shakes>0?(order&&shakeOk()?3:2):1,P=(n,t)=>`<span class="ph ${ph===n?'on':''}">${t}</span>`;
+ const items=ING_KEYS.map(k=>[ING[k][0],cup[k]]).concat(TRAP_KEYS.map(k=>['☠️'+TRAPS[k].e,cup[k]])).filter(x=>x[1]>0).map(x=>x[0]+x[1]).join(' ');
+ el('cupBar').innerHTML=`${P(1,'①加料')}${P(2,'②搖')}${P(3,'③交件')}<br>${items||'（空杯）'} 🍬${SUGAR_LB[cup.sugar]} 🧊${ICE_LB[cup.ice]} 🥤${cup.shakes}`;
+}
+const isMat=s=>!!ING[s.id]||!!TRAPS[s.id]||s.id==='sugar'||s.id==='ice';
+const matName=s=>ING[s.id]?ING[s.id][1]:TRAPS[s.id]?TRAPS[s.id].n:LBL[s.id];
+function near(){let best=null,bd=reach();STATIONS.forEach(s=>{const d=Math.hypot(player.x-s.x,player.y-s.y);if(d<bd){bd=d;best=s}});return best}
+function interact(){
+ if(!playing)return;const s=near();if(!s)return;
+ if(isMat(s)){
+  if(cup.shakes>0){flash('⚠️ 已經搖過了，不能再加料！請整杯丟棄重做');return}
+  if(ING[s.id]||TRAPS[s.id]){cup[s.id]=Math.min(5,cup[s.id]+1);if(TRAPS[s.id])flash('☠️ 踩到陷阱！杯子被污染了，要清掉才能交件')}
+  else if(s.id==='sugar')cup.sugar=Math.min(4,cup.sugar+1);
+  else cup.ice=Math.min(3,cup.ice+1);
+ }else if(s.id==='shaker'){
+  if(!hasMat()){flash('⚠️ 杯子是空的，要先加料再搖！');return}
+  cup.shakes++;
+ }else if(s.id==='counter'){
+  if(!hasMat()){flash('⚠️ 杯子是空的，先做飲料吧');return}
+  deliver();return;
+ }
+ renderCup();renderOrder();
+}
+function discard(){if(!playing)return;resetCup();flash('🗑 整杯已丟棄，重新開始')}
+function removeMat(){
+ if(!playing)return;
+ if(diff==='hard'){flash('困難模式只能整杯丟棄（R）');return}
+ const s=near();if(!s||!isMat(s)){flash('走到要取出的材料旁邊再按');return}
+ if(cup.shakes>0){flash('已經搖過了，只能整杯丟棄');return}
+ const k=s.id;if(cup[k]<=0){flash('杯子裡沒有'+matName(s));return}
+ if(diff==='easy'){cup[k]=0;flash('🧹 已清空 '+matName(s))}
+ else{cup[k]--;timeLeft=Math.max(1,timeLeft-3);showTime();flash('➖ 取出一份'+matName(s)+'　⏱-3秒')}
+ renderCup();renderOrder();
+}
+let hintT;function flash(m){const h=el('hint');h.textContent=m;h.style.display='block';clearTimeout(hintT);hintT=setTimeout(()=>h.style.display='none',1400)}
+function showTime(){const c=el('timerChip'),t=Math.max(0,Math.ceil(timeLeft));c.textContent='⏱ '+t;c.classList.toggle('low',t<=10)}
+function deliver(){
+ if(busy)return;busy=true;setTimeout(()=>busy=false,300);
+ const D=DIFFS[diff];
+ const need=ING_KEYS.filter(k=>order.r[k]>0),total=need.length+3;
+ const right=need.filter(k=>cup[k]===order.r[k]).length+(cup.sugar===order.sugar?1:0)+(cup.ice===order.ice?1:0)+(shakeOk()?1:0);
+ const extras=ING_KEYS.filter(k=>order.r[k]===0&&cup[k]>0).length,trapped=TRAP_KEYS.some(k=>cup[k]>0),cnt=Math.max(0,right-extras);
+ const vm=order.vip?2:1,um=1+.04*lv('coinBoost');let gained,tb=0,msg;
+ if(trapped){combo=0;gained=-5;msg=`☠️ 杯子被污染了！ ${gained}`}
+ else if(right===total&&extras===0){
+  combo++;const portions=ING_KEYS.reduce((a,k)=>a+order.r[k],0);
+  gained=Math.round((25+combo*3+portions*.2*lv('portion'))*vm*um*D.mult);
+  tb=D.bonus+(order.vip?2:0)+.5*lv('timeBonus');msg=`⚡完美出餐 +${gained}　⏱+${+tb.toFixed(1)}秒`;
+ }else if(cnt/total>=.6){combo=0;gained=Math.round(cnt*3*vm*um*D.mult);tb=1;msg=`${cnt}/${total} 正確 +${gained}`}
+ else{combo=0;gained=-5;msg=`❌太馬虎了 ${gained}`}
+ score=Math.max(0,score+gained);timeLeft=Math.min(maxTime,timeLeft+tb);deliveries++;
+ el('scoreChip').textContent=score;el('comboChip').textContent='x'+combo;el('comboChip').classList.toggle('hot',combo>0&&combo%5===0);
+ flash(msg);showTime();resetCup();newOrder();
+}
+function updPower(){const b=el('powerBtn');b.textContent=`🪙+10秒(${powerCost()})`;b.disabled=!playing||coins<powerCost()}
+el('powerBtn').onclick=()=>{const c=powerCost();if(!playing||coins<c)return;coins-=c;timeLeft=Math.min(maxTime,timeLeft+10);saveCoins();showTime();flash('🪙 +10 秒！')};
+
+// ---- AI ----
+function initAI(){ai=[{name:'AI-阿貓',x:80,y:100,vx:1,vy:.6,score:0,next:2+Math.random()*3},{name:'AI-阿狗',x:240,y:290,vx:-.8,vy:1,score:0,next:2+Math.random()*3}]}
+function updateAI(dt){
+ ai.forEach(b=>{b.x+=b.vx*dt*40;b.y+=b.vy*dt*40;if(b.x<16||b.x>W-16)b.vx*=-1;if(b.y<16||b.y>H-16)b.vy*=-1;
+  b.next-=dt;if(b.next<=0){b.score+=Math.round((5+Math.random()*20)*DIFFS[diff].ai);b.next=2.5+Math.random()*3.5}});
+}
+function renderLB(){
+ const rows=[{n:av.e+' 你',s:score},...ai.map(b=>({n:'🤖 '+b.name.replace('AI-',''),s:b.score}))].sort((a,b)=>b.s-a.s);
+ el('lbLive').innerHTML='🏆 即時<br>'+rows.map(r=>`${esc(r.n)} ${r.s}`).join('<br>');
+}
+
+// ---- 輸入：鍵盤 / 浮動搖桿（手指按在地圖任何地方就出現）----
+window.addEventListener('keydown',e=>{
+ if(!playing)return;const k=e.key.toLowerCase();
+ if(['arrowup','arrowdown','arrowleft','arrowright',' ','r','q','w','a','s','d'].includes(k))e.preventDefault();
+ keys[k]=true;
+ if(k===' '&&!e.repeat)interact();if(k==='r'&&!e.repeat)discard();if(k==='q'&&!e.repeat)removeMat();
+});
+window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
+(function(){
+ const zone=el('cwrap'),base=el('jBase'),knob=el('jKnob');let id=null,cx=0,cy=0;
+ function begin(x,y,i){id=i;const r=zone.getBoundingClientRect();cx=x;cy=y;base.style.left=(x-r.left)+'px';base.style.top=(y-r.top)+'px';base.style.display='block';knob.style.left='27px';knob.style.top='27px';joyVec.x=joyVec.y=0}
+ function mv(x,y){let dx=x-cx,dy=y-cy;const d=Math.hypot(dx,dy),m=40;if(d>m){dx=dx/d*m;dy=dy/d*m}knob.style.left=(27+dx)+'px';knob.style.top=(27+dy)+'px';joyVec.x=dx/m;joyVec.y=dy/m}
+ function end(){id=null;base.style.display='none';joyVec.x=joyVec.y=0}
+ joyEnd=end;
+ zone.addEventListener('touchstart',e=>{e.preventDefault();if(id!==null||!playing)return;const t=e.changedTouches[0];begin(t.clientX,t.clientY,t.identifier)},{passive:false});
+ zone.addEventListener('touchmove',e=>{e.preventDefault();for(const t of e.changedTouches)if(t.identifier===id)mv(t.clientX,t.clientY)},{passive:false});
+ const te=e=>{for(const t of e.changedTouches)if(t.identifier===id)end()};
+ zone.addEventListener('touchend',te);zone.addEventListener('touchcancel',te);
+ zone.addEventListener('mousedown',e=>{if(playing)begin(e.clientX,e.clientY,'m')});
+ window.addEventListener('mousemove',e=>{if(id==='m')mv(e.clientX,e.clientY)});
+ window.addEventListener('mouseup',()=>{if(id==='m')end()});
+})();
+[['actBtn',interact],['discardBtn',discard],['rmBtn',removeMat]].forEach(([id,f])=>{
+ el(id).addEventListener('touchstart',e=>{e.preventDefault();f()},{passive:false});el(id).addEventListener('click',f)});
+// 遊戲中禁止頁面被拖動／捲動；禁止長按選字、複製貼上選單（輸入框除外）
+document.addEventListener('touchmove',e=>{if(playing)e.preventDefault()},{passive:false});
+document.addEventListener('contextmenu',e=>{if(e.target.tagName!=='INPUT')e.preventDefault()});
+document.addEventListener('selectstart',e=>{if(e.target.tagName!=='INPUT')e.preventDefault()});
+document.addEventListener('gesturestart',e=>e.preventDefault());
+
+// ---- 繪製 ----
+function bubble(txt,x,y){
+ ctx.font='bold 11px sans-serif';const w=ctx.measureText(txt).width+12;
+ ctx.fillStyle='#4A2C1A';ctx.beginPath();ctx.roundRect?ctx.roundRect(x-w/2,y-9,w,18,6):ctx.rect(x-w/2,y-9,w,18);ctx.fill();
+ ctx.fillStyle='#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(txt,x,y);
+}
+function avatar(x,y,r,em,col){
+ ctx.beginPath();ctx.ellipse(x,y+r+3,r*.8,4,0,0,7);ctx.fillStyle='rgba(74,44,26,.2)';ctx.fill();
+ ctx.beginPath();ctx.arc(x,y,r+3,0,7);ctx.fillStyle='#4A2C1A';ctx.fill();
+ ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle=col;ctx.fill();
+ ctx.beginPath();ctx.arc(x,y,r-4,0,7);ctx.fillStyle='#fff';ctx.fill();
+ ctx.font=Math.round(r*1.2)+'px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#000';ctx.fillText(em,x,y+1);
+}
+function actionText(s){return ING[s.id]?'加'+ING[s.id][1]:TRAPS[s.id]?(DIFFS[diff].flag?'⚠️ 陷阱！':'加'+TRAPS[s.id].n):s.id==='sugar'?'加糖 +1級':s.id==='ice'?'加冰 +1級':s.id==='shaker'?'搖！':'交件'}
+function draw(){
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#FFF9EE';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='rgba(150,110,80,.08)';ctx.lineWidth=1;
+ for(let i=0;i<=W;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,H);ctx.stroke()}
+ for(let j=0;j<=H;j+=40){ctx.beginPath();ctx.moveTo(0,j);ctx.lineTo(W,j);ctx.stroke()}
+ const nr=near();
+ STATIONS.forEach(s=>{
+  const flag=!!TRAPS[s.id]&&DIFFS[diff].flag,isNear=nr&&nr.id===s.id;
+  ctx.beginPath();ctx.arc(s.x,s.y,22,0,7);ctx.fillStyle=s.c;ctx.fill();
+  ctx.lineWidth=isNear?4:2;ctx.strokeStyle=isNear?'#FF8A3D':(flag?'#E5484D':'#4A2C1A');
+  if(flag)ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
+  ctx.font='20px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#000';ctx.fillText(s.e,s.x,s.y+1);
+  if(flag){ctx.font='12px sans-serif';ctx.fillText('⚠️',s.x+17,s.y-17)}
+  ctx.font='bold 10px sans-serif';ctx.fillStyle=flag?'#E5484D':'#4A2C1A';ctx.fillText(s.n,s.x,s.y+31);
+ });
+ ai.forEach(b=>avatar(b.x,b.y,10,'🤖','#9B8CB5'));
+ avatar(player.x,player.y,player.r,av.e,av.c);
+ bubble(playerName.slice(0,6),player.x,player.y+player.r+14);
+ if(nr)bubble(actionText(nr),Math.max(36,Math.min(W-36,player.x)),player.y-player.r-14);
+ const tl=Math.max(0,timeLeft),fr=Math.min(1,tl/startTime);
+ ctx.fillStyle='rgba(74,44,26,.14)';ctx.fillRect(0,0,W,14);
+ ctx.fillStyle=tl<=10?'#FF7A7A':'#8FD49A';ctx.fillRect(0,0,W*fr,14);
+ ctx.fillStyle='#4A2C1A';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('⏱ '+Math.ceil(tl)+' 秒',W/2,7.5);
+}
+let lastT=0;
+function loop(t){
+ if(playing){
+  const dt=Math.min(.05,(t-lastT)/1000||.016);
+  let dx=0,dy=0;
+  if(keys.arrowup||keys.w)dy--;if(keys.arrowdown||keys.s)dy++;if(keys.arrowleft||keys.a)dx--;if(keys.arrowright||keys.d)dx++;
+  dx+=joyVec.x;dy+=joyVec.y;const len=Math.hypot(dx,dy),sp=2.2*(1+.06*lv('fastFeet'))*60*dt;
+  if(len>.12){const m=Math.min(1,len);player.x+=dx/len*sp*m;player.y+=dy/len*sp*m}
+  player.x=Math.max(player.r,Math.min(W-player.r,player.x));player.y=Math.max(player.r,Math.min(H-player.r,player.y));
+  updateAI(dt);draw();renderLB();
+ }
+ lastT=t;requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+function buildStations(){
+ const D=DIFFS[diff],slots=FREE_SLOTS.slice().sort(()=>Math.random()-.5);
+ STATIONS=REAL_STATIONS.concat(D.traps.map((id,i)=>({id,x:slots[i][0],y:slots[i][1],e:TRAPS[id].e,n:TRAPS[id].n,c:TRAPS[id].c})));
+}
+// ---- 流程 ----
+function startGame(){
+ const D=DIFFS[diff];
+ deliveries=0;score=0;combo=lv('headStart');order=null;resetCup();
+ timeLeft=D.time+3*lv('moreTime');startTime=timeLeft;maxTime=timeLeft+30;
+ player.x=160;player.y=305;keys={};buildStations();joyVec.x=joyVec.y=0;initAI();newOrder();
+ el('scoreChip').textContent=0;el('comboChip').textContent='x'+combo;el('comboChip').classList.remove('hot');showTime();
+ el('rmBtn').style.display=D.rm?'block':'none';el('rmBtn').textContent=D.rm;
+ playing=true;updPower();
+ el('startOverlay').classList.add('hidden');document.body.classList.add('playing');el('gameWrap').style.display='flex';
+ fit();requestAnimationFrame(fit);
+ clearInterval(timerId);
+ timerId=setInterval(()=>{timeLeft--;showTime();if(timeLeft<=0){clearInterval(timerId);endGame()}},1000);
+}
+async function endGame(){
+ playing=false;gameOverOnce=true;joyEnd();updPower();
+ coins+=score;saveCoins();
+ el('gameWrap').style.display='none';document.body.classList.remove('playing');
+ el('finalScore').textContent=score;el('coinGain').textContent=score;el('endDiff').textContent=DIFFS[diff].label;
+ el('lbTop10').innerHTML='載入排行榜中…';
+ el('startPanel').style.display='none';el('shopPanel').style.display='none';el('endPanel').style.display='block';
+ el('startOverlay').classList.remove('hidden');
+ let handled=false,note='';
+ if(FIREBASE_PROJECT_ID){
+  if(await fbAddScore(playerName,score,diff,av.e)){const top=await fbGetTop10();if(top){renderTop10(top,'🌐 全球排行榜（所有人共用）');handled=true}}
+  if(!handled)note='（雲端連線失敗，先存在此裝置）';
+ }
+ if(!handled){
+  localLB.push({name:playerName,score,diff,av:av.e});localLB.sort((a,b)=>b.score-a.score);localLB=localLB.slice(0,10);
+  try{localStorage.setItem('mtLeaderboard',JSON.stringify(localLB))}catch(e){}
+  renderTop10(localLB,'📍 排行榜（僅此裝置）'+note);
+ }
+}
+el('startBtn').onclick=()=>{playerName=el('nickInput').value.trim()||('玩家'+Math.floor(Math.random()*900+100));startGame()};
+el('restartBtn').onclick=()=>{el('endPanel').style.display='none';el('startPanel').style.display='block'};
+loadSave();renderDiff();renderAvatar();updPower();
+})();
+</script>
+</body>
+</html>
