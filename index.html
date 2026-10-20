@@ -76,7 +76,7 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
 .ph{display:inline-block;border-radius:8px;padding:0 6px;margin-right:3px;border:1.5px solid var(--line);color:var(--ink2)}
 .ph.on{background:var(--yellow);border-color:var(--ink);color:var(--ink)}
 .btns{display:flex;gap:8px}
-.actbtn{height:50px;border-radius:14px;border:2px solid var(--ink);font-weight:900;font-size:.85rem;cursor:pointer;box-shadow:0 4px 0 var(--ink);font-family:inherit}
+.actbtn{height:56px;border-radius:14px;border:2px solid var(--ink);font-weight:900;font-size:.85rem;cursor:pointer;box-shadow:0 4px 0 var(--ink);font-family:inherit}
 .actbtn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
 .actbtn.go{flex:1.7;background:var(--orange);color:#fff;font-size:.95rem}.actbtn.dis{flex:1.2;background:#fff;color:var(--red)}.actbtn.rm{flex:1;background:#fff;color:var(--ink)}
 
@@ -94,6 +94,15 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
 .rb th{background:var(--yellow)}
 .hud,.ordercard,.infobar,.btns{flex-shrink:0}
 #timerChip{font-size:1rem;min-width:84px;text-align:center}
+
+.acct{display:flex;align-items:center;gap:8px;justify-content:space-between;background:#FFF9EC;border:2px solid var(--line);border-radius:12px;padding:6px 10px;margin:8px 0;font-size:.74rem;font-weight:700;text-align:left}
+.smallbtn{border:2px solid var(--ink);border-radius:10px;background:var(--yellow);color:var(--ink);font-weight:900;font-size:.76rem;padding:5px 10px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.smallbtn.alt{background:#fff;width:100%;margin:2px 0 8px}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+.bump{animation:bump .18s ease-out}
+@keyframes popin{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+.pill.new{animation:popin .22s ease-out}
+.actbtn:active{filter:brightness(.92)}
 </style>
 </head>
 <body>
@@ -111,6 +120,7 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
    <div class="wordmark"><span class="w1">手搖飲挑戰</span><span class="io">.io</span></div>
    <div class="tag">限時調飲・搶業績的手搖店遊戲</div>
   </div>
+  <div class="acct"><span id="acctText"></span><button class="smallbtn" id="loginBtn">Google 登入</button></div>
   <div class="howto">
    <h3>📖 遊戲玩法</h3>
    <ol>
@@ -138,7 +148,7 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
     <ul><li><b>①加料</b>：走到工作站旁（圈圈變橘色，上方出現黑色提示），按「互動」一次加一份；糖和冰是一次加一級。</li>
     <li><b>②搖</b>：材料都對了，再到 🥤 搖酒器，按一次搖一下，搖到指定次數。簡單／中等搖得比要求多也可以；困難只能搖「要求次數～多 2 次」，例如 5～7 下。</li>
     <li><b>③交件</b>：搖完到 🛎️ 櫃檯按互動。</li></ul>
-    <p>⚠️ 搖過之後<b>不能再加料</b>；空杯子不能搖，也不能交件。要搖的次數會越來越多：每交 3 杯多 1 下，最多多 3 下。</p>
+    <p>⚠️ 搖過之後<b>不能再加料</b>；空杯子不能搖，也不能交件。要搖的次數會越來越多：每交 3 杯多 1 下，最多多 3 下。站在搖酒器旁<b>按住互動鍵</b>（電腦按住空白鍵）可以連續快速搖。</p>
    </div></details>
    <details><summary>🧮 計分與時間</summary><div class="rb">
     <p>每杯飲料會檢查：訂單上列出的<b>每一種材料份數</b>、甜度、冰量、搖的次數。另外加了「訂單沒有」的材料，每多一種就倒扣一項正確。</p>
@@ -171,10 +181,15 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
    </div></details>
    <details><summary>🪙 金幣、商店與 AI 對手</summary><div class="rb">
     <ul><li>每局結束，分數 1:1 換成金幣，存在這個裝置上。</li>
-    <li>商店有 8 種升級，最高 5 級（部分 3 級），每一級的效果都很小，慢慢累積。</li>
+    <li>商店有 8 種升級，最高 5 級（部分 3 級），每一級的效果都很小，費用也會越升越貴，需要慢慢累積。</li>
     <li>遊戲中也能花 30 金幣買「＋10 秒」（商店升級後更便宜）。</li>
     <li>場上兩位 🤖 AI 只是陪你比分數，會自己慢慢累積業績，不會影響你的得分；畫面下方的即時排行榜可以看誰領先。</li>
     <li>結束後成績會進前十名排行榜（目前只存在這個裝置，雲端共用版需要另外設定）。</li></ul>
+   </div></details>
+   <details><summary>☁️ 登入與雲端存檔</summary><div class="rb">
+    <ul><li>按「Google 登入」後，金幣、商店升級、頭像、難度和暱稱會自動存到雲端，換手機或電腦登入同一個帳號就能接著玩。</li>
+    <li>只有登入後，成績才會送上<b>全球排行榜</b>（每人只留最佳成績）。沒登入也能玩，進度只存在這個裝置。</li>
+    <li>如果是從 claude.ai 的連結打開，無法連到雲端，請用你自己的 GitHub 網址。</li></ul>
    </div></details>
    <details><summary>🎮 操作方式</summary><div class="rb">
     <ul><li><b>電腦</b>：WASD／方向鍵移動、空白鍵互動、Q 取出／清空、R 整杯丟棄。</li>
@@ -189,6 +204,7 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
   <div class="diff" id="diffRow"><button data-d="easy" class="easy">簡單</button><button data-d="normal" class="normal">中等</button><button data-d="hard" class="hard">困難</button></div>
   <p class="diffdesc" id="diffDesc"></p>
   <div class="coinline">🪙 金幣：<span id="coinDisplay">0</span></div>
+  <button class="smallbtn alt" id="sndBtn">🔊 音效與震動：開</button>
   <input class="nick" id="nickInput" maxlength="10" placeholder="輸入你的暱稱">
   <button class="bigbtn go" id="startBtn">開始上工</button>
   <button class="bigbtn alt" id="shopBtnStart">🛍️ 商店</button>
@@ -202,6 +218,7 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
   <div style="font-size:.8rem;color:var(--ink2)">難度：<span id="endDiff"></span>　本局得分</div>
   <div style="font-weight:900;font-size:2.4rem" id="finalScore">0</div>
   <div class="coinline">已換成 <span id="coinGain">0</span> 金幣</div>
+  <div class="acct"><span id="acctText2"></span><button class="smallbtn" id="loginBtn2">Google 登入</button></div>
   <div class="lbbox" id="lbTop10"></div>
   <button class="bigbtn go" id="restartBtn">再上工一次</button>
   <button class="bigbtn alt" id="endShopBtn">🛍️ 商店</button>
@@ -220,6 +237,9 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
 </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script>
 (function(){
 const W=320,H=400,el=id=>document.getElementById(id),pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -272,11 +292,12 @@ function loadSave(){
  try{upgrades=JSON.parse(localStorage.getItem('mtUpgrades')||'{}')}catch(e){}
  try{const d=localStorage.getItem('mtDiff');if(DIFFS[d])diff=d}catch(e){}
  try{const a=JSON.parse(localStorage.getItem('mtAvatar')||'null');if(a&&a.e&&a.c)av=a}catch(e){}
+ try{const n=localStorage.getItem('mtNick');if(n)el('nickInput').value=n}catch(e){}
  showCoins();
 }
 function showCoins(){el('coinDisplay').textContent=coins;el('coinDisplay2').textContent=coins}
-function saveCoins(){try{localStorage.setItem('mtCoins',String(coins))}catch(e){}showCoins();updPower()}
-function saveUpg(){try{localStorage.setItem('mtUpgrades',JSON.stringify(upgrades))}catch(e){}}
+function saveCoins(){try{localStorage.setItem('mtCoins',String(coins))}catch(e){}showCoins();updPower();schedulePush()}
+function saveUpg(){try{localStorage.setItem('mtUpgrades',JSON.stringify(upgrades))}catch(e){}schedulePush()}
 
 function renderAvatar(){
  const p=el('avPrev');p.textContent=av.e;p.style.borderColor=av.c;
@@ -285,19 +306,19 @@ function renderAvatar(){
  const c=el('avColors');c.innerHTML='';
  AV_COLOR.forEach(x=>{const b=document.createElement('button');b.style.background=x;b.className=x===av.c?'sel':'';b.onclick=()=>{av.c=x;saveAv();renderAvatar()};c.appendChild(b)});
 }
-function saveAv(){try{localStorage.setItem('mtAvatar',JSON.stringify(av))}catch(e){}}
+function saveAv(){try{localStorage.setItem('mtAvatar',JSON.stringify(av))}catch(e){}schedulePush()}
 el('avCustom').addEventListener('input',e=>{const x=g1(e.target.value);if(x){av.e=x;e.target.value=x;saveAv();el('avPrev').textContent=x;el('avGrid').querySelectorAll('button').forEach(b=>b.classList.remove('sel'))}});
 
 function renderDiff(){
  document.querySelectorAll('#diffRow button').forEach(b=>b.classList.toggle('sel',b.dataset.d===diff));
  el('diffDesc').textContent=DIFFS[diff].desc;
 }
-document.querySelectorAll('#diffRow button').forEach(b=>b.onclick=()=>{diff=b.dataset.d;try{localStorage.setItem('mtDiff',diff)}catch(e){}renderDiff()});
+document.querySelectorAll('#diffRow button').forEach(b=>b.onclick=()=>{diff=b.dataset.d;try{localStorage.setItem('mtDiff',diff)}catch(e){}renderDiff();schedulePush()});
 
 function renderShop(){
  const list=el('shopList');list.innerHTML='';
  SHOP_ITEMS.forEach(it=>{
-  const L=lv(it.id),maxed=L>=it.max,cost=Math.round(it.base*(1+.45*L)),row=document.createElement('div');row.className='shop-item';
+  const L=lv(it.id),maxed=L>=it.max,cost=Math.round(it.base*3*Math.pow(1.5,L)),row=document.createElement('div');row.className='shop-item';
   row.innerHTML=`<div class="d">${it.icon} ${it.name} <span class="pips">${'●'.repeat(L)}${'○'.repeat(it.max-L)}</span><small>目前：${L?it.eff(L):'尚未升級'}${maxed?'':'　→ 下一級：'+it.eff(L+1)}</small></div>`;
   const b=document.createElement('button');b.className='buy'+(maxed?' owned':'');b.textContent=maxed?'已滿級':`Lv.${L+1} 🪙${cost}`;b.disabled=maxed||coins<cost;
   b.onclick=()=>{if(maxed||coins<cost)return;coins-=cost;upgrades[it.id]=L+1;saveCoins();saveUpg();renderShop()};
@@ -308,35 +329,110 @@ el('shopBtnStart').onclick=()=>{el('startPanel').style.display='none';el('shopPa
 el('endShopBtn').onclick=()=>{el('endPanel').style.display='none';el('shopPanel').style.display='block';renderShop()};
 el('shopBack').onclick=()=>{el('shopPanel').style.display='none';el(gameOverOnce?'endPanel':'startPanel').style.display='block'};
 
-// ---- 排行榜：本機備援 + Firebase Firestore（填入 FIREBASE_PROJECT_ID 就會變成跨裝置共用）----
-const FIREBASE_PROJECT_ID='';
-let localLB=[];
-try{localLB=JSON.parse(localStorage.getItem('mtLeaderboard')||'[]')}catch(e){}
-const fsBase=()=>`https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents`;
-async function fbAddScore(name,sc,d,a){
+// ---- 雲端：Google 登入 + 存檔 + 全球排行榜（Firebase）----
+const FIREBASE_CONFIG={apiKey:"AIzaSyDANOdTVYNCMyl9IQDL3UAHixilKOa5JGU",authDomain:"milktea-game-io.firebaseapp.com",projectId:"milktea-game-io",storageBucket:"milktea-game-io.firebasestorage.app",messagingSenderId:"979281984020",appId:"1:979281984020:web:cce7ce63f4e5cf6d978501"};
+const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+let auth=null,fdb=null,user=null,pushT=null,cloudMsg='',localLB=[];
+try{localLB=JSON.parse(LS.get('mtLeaderboard')||'[]')}catch(e){}
+function renderAcct(){
+ const on=!!user,name=on?esc((user.displayName||user.email||'玩家').slice(0,16)):'';
+ const txt=on?`☁️ 已登入：${name}${cloudMsg?'　'+cloudMsg:''}`:(auth?'☁️ 尚未登入：進度只存在這個裝置':'📴 目前無法連線雲端（請用你自己的網址開啟）');
+ ['acctText','acctText2'].forEach(id=>el(id).innerHTML=txt);
+ ['loginBtn','loginBtn2'].forEach(id=>{const b=el(id);b.style.display=auth?'inline-block':'none';b.textContent=on?'登出':'Google 登入';b.onclick=on?logout:login});
+}
+function initFirebase(){
+ if(typeof firebase==='undefined')return;
+ try{firebase.initializeApp(FIREBASE_CONFIG);auth=firebase.auth();fdb=firebase.firestore();auth.onAuthStateChanged(onAuth)}catch(e){auth=null;fdb=null}
+}
+async function login(){
+ if(!auth)return;const pv=new firebase.auth.GoogleAuthProvider();
+ try{await auth.signInWithPopup(pv)}
+ catch(e){
+  if(e.code==='auth/popup-blocked'||e.code==='auth/operation-not-supported-in-this-environment')auth.signInWithRedirect(pv);
+  else if(e.code==='auth/unauthorized-domain')alert('這個網址還沒加進 Firebase 的「授權網域」。請到 Firebase → Authentication → Settings → Authorized domains，加入目前網址的網域。');
+  else if(e.code==='auth/operation-not-allowed')alert('還沒在 Firebase 啟用 Google 登入方式。');
+  else if(e.code!=='auth/popup-closed-by-user'&&e.code!=='auth/cancelled-popup-request')alert('登入失敗：'+(e.code||e.message));
+ }
+}
+function logout(){if(auth)auth.signOut()}
+function schedulePush(){LS.set('mtDirty','1');if(!user||!fdb)return;clearTimeout(pushT);pushT=setTimeout(pushCloud,1200)}
+async function pushCloud(){
+ if(!user||!fdb)return;const t=Date.now();
+ try{await fdb.collection('players').doc(user.uid).set({coins,upgrades,av,diff,nick:el('nickInput').value.slice(0,10),updatedAt:t});LS.set('mtDirty','0');LS.set('mtSyncedAt',String(t));cloudMsg='✅ 已同步'}
+ catch(e){cloudMsg='⚠️ 存檔同步失敗'}
+ renderAcct();
+}
+function applyCloud(d){
+ coins=d.coins|0;upgrades=d.upgrades||{};
+ if(d.av&&d.av.e&&d.av.c)av=d.av;
+ if(DIFFS[d.diff])diff=d.diff;
+ if(d.nick){el('nickInput').value=d.nick;LS.set('mtNick',d.nick)}
+ LS.set('mtCoins',String(coins));LS.set('mtUpgrades',JSON.stringify(upgrades));LS.set('mtAvatar',JSON.stringify(av));LS.set('mtDiff',diff);
+ LS.set('mtDirty','0');LS.set('mtSyncedAt',String(d.updatedAt||Date.now()));
+ showCoins();renderAvatar();renderDiff();updPower();
+}
+async function onAuth(u){
+ user=u;cloudMsg='';renderAcct();
+ if(!u)return;
+ if(!el('nickInput').value)el('nickInput').value=(u.displayName||'').slice(0,10);
  try{
-  const r=await fetch(fsBase()+'/scores',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:{
-   name:{stringValue:String(name).slice(0,20)},score:{integerValue:String(sc)},diff:{stringValue:d},av:{stringValue:a},ts:{integerValue:String(Date.now())}}})});
-  return r.ok;
+  const snap=await fdb.collection('players').doc(u.uid).get(),dirty=LS.get('mtDirty')==='1',seen=Number(LS.get('mtSyncedAt')||0);
+  if(snap.exists){
+   const d=snap.data(),ct=d.updatedAt||0;
+   if(ct>seen){
+    const hasLocal=coins>0||Object.keys(upgrades).length>0,differ=d.coins!==coins||JSON.stringify(d.upgrades||{})!==JSON.stringify(upgrades);
+    if(dirty&&hasLocal&&differ&&!confirm('雲端已有存檔（金幣 '+(d.coins||0)+'），和這台裝置的不同。\n按「確定」＝改用雲端存檔；按「取消」＝用這台裝置的進度覆蓋雲端。'))await pushCloud();
+    else applyCloud(d);
+   }else if(dirty)await pushCloud();
+  }else await pushCloud();
+  cloudMsg='✅ 已同步';
+ }catch(e){cloudMsg='⚠️ 存檔同步失敗（請確認 Firestore 規則）'}
+ renderAcct();
+}
+async function submitScore(){
+ if(!user||!fdb)return false;
+ try{
+  const ref=fdb.collection('scores').doc(user.uid),s=await ref.get();
+  if(!s.exists||score>(s.data().score||0))await ref.set({uid:user.uid,name:playerName.slice(0,20),score,diff,av:av.e,ts:Date.now()});
+  return true;
  }catch(e){return false}
 }
-async function fbGetTop10(){
+async function fetchTop10(){
  try{
-  const r=await fetch(fsBase()+':runQuery',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{
-   from:[{collectionId:'scores'}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:10}})});
+  if(fdb){const s=await fdb.collection('scores').orderBy('score','desc').limit(10).get();return s.docs.map(d=>d.data())}
+  const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:'scores'}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:10}})});
   if(!r.ok)return null;
-  const data=await r.json();
-  return data.filter(d=>d.document&&d.document.fields).map(d=>{const f=d.document.fields;
+  return(await r.json()).filter(d=>d.document&&d.document.fields).map(d=>{const f=d.document.fields;
    return{name:(f.name&&f.name.stringValue)||'?',score:parseInt((f.score&&f.score.integerValue)||'0',10),diff:(f.diff&&f.diff.stringValue)||'',av:(f.av&&f.av.stringValue)||''}});
  }catch(e){return null}
 }
-function renderTop10(list,label){
+function renderTop10(list,label,note){
  const rows=(list&&list.length)?list.slice(0,10).map((r,i)=>`#${i+1} ${esc(r.av||'')} ${esc(r.name)} — ${r.score} 分${DIFFS[r.diff]?' ['+DIFFS[r.diff].label+']':''}`).join('<br>'):'還沒有紀錄';
- el('lbTop10').innerHTML=`<b>${label}</b><br>${rows}`;
+ el('lbTop10').innerHTML=`<b>${label}</b><br>${rows}${note?'<br><span style="color:var(--ink2)">'+note+'</span>':''}`;
 }
 
+// ---- 手感回饋：音效 / 震動 / 浮動文字 / 抖動 ----
+let fbOn=LS.get('mtFx')!=='0',AC=null,floaters=[],pulse={},shakeT=0,lastRep=0,prevOk=new Set(),curOk=new Set();
+function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended'){try{AC.resume()}catch(e){}}return AC}
+function tone(f,d,type,v,slide,when){
+ const a=fbOn&&ac();if(!a)return;const t=a.currentTime+(when||0),o=a.createOscillator(),g=a.createGain();
+ o.type=type||'sine';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(40,f+slide),t+d);
+ g.gain.setValueAtTime(v||.12,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.02);
+}
+function vib(p){if(fbOn&&navigator.vibrate){try{navigator.vibrate(p)}catch(e){}}}
+const SFX={
+ add:n=>tone(420+n*55,.09,'triangle',.14),shake:()=>tone(180+Math.random()*90,.05,'square',.05),take:()=>tone(360,.08,'triangle',.1,-140),
+ deny:()=>tone(150,.14,'square',.08,-30),trap:()=>{tone(230,.22,'sawtooth',.1,-130);tone(110,.3,'square',.08,0,.1)},
+ ok:()=>{tone(620,.1,'sine',.14);tone(820,.16,'sine',.14,0,.09)},perfect:()=>[660,830,990,1320].forEach((f,i)=>tone(f,.15,'sine',.15,0,i*.075)),
+ bad:()=>tone(200,.25,'sawtooth',.1,-90),tick:()=>tone(900,.04,'square',.05)
+};
+function pop(txt,x,y,col){floaters.push({t:txt,x,y,life:.9,col:col||'#4A2C1A'})}
+function bump(id){const e=el(id);e.classList.remove('bump');void e.offsetWidth;e.classList.add('bump')}
+function deny(msg){flash(msg);SFX.deny();vib(25)}
+function renderSnd(){el('sndBtn').textContent=fbOn?'🔊 音效與震動：開':'🔇 音效與震動：關'}
+el('sndBtn').onclick=()=>{fbOn=!fbOn;LS.set('mtFx',fbOn?'1':'0');renderSnd();if(fbOn){ac();SFX.ok();vib(15)}};
 // ---- 遊戲狀態 ----
-let playing=false,busy=false,player={x:160,y:270,r:15},keys={},joyVec={x:0,y:0},joyEnd=()=>{};
+let playing=false,busy=false,player={x:160,y:270,r:15},keys={},joyVec={x:0,y:0},joyEnd=()=>{},vx=0,vy=0;
 let startTime=60,cup,order,deliveries=0,combo=0,score=0,timeLeft=60,maxTime=90,timerId=null,ai=[];
 function resetCup(){cup={sugar:0,ice:0,shakes:0};ING_KEYS.concat(TRAP_KEYS).forEach(k=>cup[k]=0);renderCup();if(order)renderOrder()}
 function shakeOk(){const n=order.shakes;return cup.shakes>=n&&(diff!=='hard'||cup.shakes<=n+2)}
@@ -346,11 +442,11 @@ function newOrder(){
  order={m,r:Object.assign(Object.fromEntries(ING_KEYS.map(k=>[k,0])),m.r),
   sugar:pick(diff==='easy'?[0,2,4]:[0,1,2,3,4]),ice:pick(diff==='easy'?[0,2,3]:[0,1,2,3]),
   shakes:D.shake+Math.min(3,Math.floor(deliveries/3))+Math.floor(Math.random()*2),vip:deliveries>0&&deliveries%5===0};
- renderOrder();
+ prevOk=new Set();renderOrder();
 }
-const pill=(t,c)=>`<span class="pill ${c}">${t}</span>`;
+const pill=(t,c)=>{if(c==='ok'){curOk.add(t);return `<span class="pill ok${prevOk.has(t)?'':' new'}">${t}</span>`}return `<span class="pill ${c}">${t}</span>`};
 function renderOrder(){
- const c=el('orderCard');c.classList.toggle('vip',order.vip);
+ const c=el('orderCard');c.classList.toggle('vip',order.vip);curOk=new Set();
  let h=`<div class="oname">${order.vip?'<span class="vipt">⭐VIP 雙倍</span> ':''}${order.m.e} ${order.m.n}</div>`;
  ING_KEYS.forEach(k=>{
   if(order.r[k]>0)h+=pill(`${ING[k][0]}${ING[k][1]} ×${order.r[k]}`,cup[k]===order.r[k]?'ok':'');
@@ -359,7 +455,7 @@ function renderOrder(){
  TRAP_KEYS.forEach(k=>{if(cup[k]>0)h+=pill(`☠️污染：${TRAPS[k].n}`,'bad')});
  h+=pill('🍬'+SUGAR_LB[order.sugar],cup.sugar===order.sugar?'ok':'')+pill('🧊'+ICE_LB[order.ice],cup.ice===order.ice?'ok':'')
   +pill(`🥤搖${order.shakes}${diff==='hard'?'~'+(order.shakes+2):''}下`,shakeOk()?'ok':'');
- c.innerHTML=h;
+ c.innerHTML=h;prevOk=curOk;
 }
 function renderCup(){
  const ph=cup.shakes>0?(order&&shakeOk()?3:2):1,P=(n,t)=>`<span class="ph ${ph===n?'on':''}">${t}</span>`;
@@ -369,31 +465,38 @@ function renderCup(){
 const isMat=s=>!!ING[s.id]||!!TRAPS[s.id]||s.id==='sugar'||s.id==='ice';
 const matName=s=>ING[s.id]?ING[s.id][1]:TRAPS[s.id]?TRAPS[s.id].n:LBL[s.id];
 function near(){let best=null,bd=reach();STATIONS.forEach(s=>{const d=Math.hypot(player.x-s.x,player.y-s.y);if(d<bd){bd=d;best=s}});return best}
-function interact(){
+function interact(rep){
  if(!playing)return;const s=near();if(!s)return;
+ if(rep){if(s.id!=='shaker')return;const n=performance.now();if(n-lastRep<85)return;lastRep=n}
  if(isMat(s)){
-  if(cup.shakes>0){flash('⚠️ 已經搖過了，不能再加料！請整杯丟棄重做');return}
-  if(ING[s.id]||TRAPS[s.id]){cup[s.id]=Math.min(5,cup[s.id]+1);if(TRAPS[s.id])flash('☠️ 踩到陷阱！杯子被污染了，要清掉才能交件')}
-  else if(s.id==='sugar')cup.sugar=Math.min(4,cup.sugar+1);
-  else cup.ice=Math.min(3,cup.ice+1);
+  if(cup.shakes>0){deny('⚠️ 已經搖過了，不能再加料！請整杯丟棄重做');return}
+  const k=s.id;
+  if(ING[k]||TRAPS[k]){
+   cup[k]=Math.min(5,cup[k]+1);
+   if(TRAPS[k]){flash('☠️ 踩到陷阱！杯子被污染了，要清掉才能交件');SFX.trap();vib([40,30,60]);shakeT=.3;pop('☠️',s.x,s.y-26,'#E5484D')}
+   else{SFX.add(cup[k]);vib(8);pop('+1 '+ING[k][1],s.x,s.y-26)}
+  }else if(k==='sugar'){cup.sugar=Math.min(4,cup.sugar+1);SFX.add(cup.sugar);vib(8);pop(SUGAR_LB[cup.sugar],s.x,s.y-26)}
+  else{cup.ice=Math.min(3,cup.ice+1);SFX.add(cup.ice);vib(8);pop(ICE_LB[cup.ice],s.x,s.y-26)}
+  pulse[s.id]=1;
  }else if(s.id==='shaker'){
-  if(!hasMat()){flash('⚠️ 杯子是空的，要先加料再搖！');return}
-  cup.shakes++;
+  if(!hasMat()){deny('⚠️ 杯子是空的，要先加料再搖！');return}
+  cup.shakes++;SFX.shake();vib(5);pop('搖 '+cup.shakes,s.x,s.y-26,'#3D5FCB');pulse[s.id]=1;
  }else if(s.id==='counter'){
-  if(!hasMat()){flash('⚠️ 杯子是空的，先做飲料吧');return}
+  if(!hasMat()){deny('⚠️ 杯子是空的，先做飲料吧');return}
   deliver();return;
  }
- renderCup();renderOrder();
+ bump('cupBar');renderCup();renderOrder();
 }
-function discard(){if(!playing)return;resetCup();flash('🗑 整杯已丟棄，重新開始')}
+function discard(){if(!playing)return;resetCup();flash('🗑 整杯已丟棄，重新開始');SFX.take();vib(12);bump('cupBar')}
 function removeMat(){
  if(!playing)return;
- if(diff==='hard'){flash('困難模式只能整杯丟棄（R）');return}
- const s=near();if(!s||!isMat(s)){flash('走到要取出的材料旁邊再按');return}
- if(cup.shakes>0){flash('已經搖過了，只能整杯丟棄');return}
- const k=s.id;if(cup[k]<=0){flash('杯子裡沒有'+matName(s));return}
+ if(diff==='hard'){deny('困難模式只能整杯丟棄（R）');return}
+ const s=near();if(!s||!isMat(s)){deny('走到要取出的材料旁邊再按');return}
+ if(cup.shakes>0){deny('已經搖過了，只能整杯丟棄');return}
+ const k=s.id;if(cup[k]<=0){deny('杯子裡沒有'+matName(s));return}
  if(diff==='easy'){cup[k]=0;flash('🧹 已清空 '+matName(s))}
  else{cup[k]--;timeLeft=Math.max(1,timeLeft-3);showTime();flash('➖ 取出一份'+matName(s)+'　⏱-3秒')}
+ SFX.take();vib(12);pop('−',s.x,s.y-26,'#8A6A55');pulse[s.id]=1;bump('cupBar');
  renderCup();renderOrder();
 }
 let hintT;function flash(m){const h=el('hint');h.textContent=m;h.style.display='block';clearTimeout(hintT);hintT=setTimeout(()=>h.style.display='none',1400)}
@@ -414,7 +517,11 @@ function deliver(){
  else{combo=0;gained=-5;msg=`❌太馬虎了 ${gained}`}
  score=Math.max(0,score+gained);timeLeft=Math.min(maxTime,timeLeft+tb);deliveries++;
  el('scoreChip').textContent=score;el('comboChip').textContent='x'+combo;el('comboChip').classList.toggle('hot',combo>0&&combo%5===0);
- flash(msg);showTime();resetCup();newOrder();
+ const cs=STATIONS.find(x=>x.id==='counter');
+ if(trapped||gained<0){SFX.bad();vib([60,40,60]);shakeT=.25;pop(String(gained),cs.x,cs.y-28,'#E5484D')}
+ else if(right===total&&extras===0){SFX.perfect();vib([15,40,15,40,30]);pop('+'+gained,cs.x,cs.y-28,'#2E7D3A');bump('comboChip')}
+ else{SFX.ok();vib(20);pop('+'+gained,cs.x,cs.y-28,'#B36A00')}
+ flash(msg);showTime();resetCup();newOrder();bump('orderCard');
 }
 function updPower(){const b=el('powerBtn');b.textContent=`🪙+10秒(${powerCost()})`;b.disabled=!playing||coins<powerCost()}
 el('powerBtn').onclick=()=>{const c=powerCost();if(!playing||coins<c)return;coins-=c;timeLeft=Math.min(maxTime,timeLeft+10);saveCoins();showTime();flash('🪙 +10 秒！')};
@@ -435,7 +542,7 @@ window.addEventListener('keydown',e=>{
  if(!playing)return;const k=e.key.toLowerCase();
  if(['arrowup','arrowdown','arrowleft','arrowright',' ','r','q','w','a','s','d'].includes(k))e.preventDefault();
  keys[k]=true;
- if(k===' '&&!e.repeat)interact();if(k==='r'&&!e.repeat)discard();if(k==='q'&&!e.repeat)removeMat();
+ if(k===' ')interact(e.repeat);if(k==='r'&&!e.repeat)discard();if(k==='q'&&!e.repeat)removeMat();
 });
 window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
 (function(){
@@ -452,8 +559,17 @@ window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
  window.addEventListener('mousemove',e=>{if(id==='m')mv(e.clientX,e.clientY)});
  window.addEventListener('mouseup',()=>{if(id==='m')end()});
 })();
-[['actBtn',interact],['discardBtn',discard],['rmBtn',removeMat]].forEach(([id,f])=>{
- el(id).addEventListener('touchstart',e=>{e.preventDefault();f()},{passive:false});el(id).addEventListener('click',f)});
+[['discardBtn',discard],['rmBtn',removeMat]].forEach(([id,f])=>{
+ el(id).addEventListener('touchstart',e=>{e.preventDefault();ac();f()},{passive:false});el(id).addEventListener('click',f)});
+// 互動鍵：按住在搖酒器旁可連續搖
+(function(){
+ const b=el('actBtn');let to=null,iv=null;
+ const stop=()=>{clearTimeout(to);clearInterval(iv);to=iv=null};
+ const go=()=>{ac();interact();stop();to=setTimeout(()=>{iv=setInterval(()=>interact(true),95)},330)};
+ b.addEventListener('touchstart',e=>{e.preventDefault();go()},{passive:false});
+ b.addEventListener('touchend',stop);b.addEventListener('touchcancel',stop);
+ b.addEventListener('mousedown',go);window.addEventListener('mouseup',stop);b.addEventListener('mouseleave',stop);
+})();
 // 遊戲中禁止頁面被拖動／捲動；禁止長按選字、複製貼上選單（輸入框除外）
 document.addEventListener('touchmove',e=>{if(playing)e.preventDefault()},{passive:false});
 document.addEventListener('contextmenu',e=>{if(e.target.tagName!=='INPUT')e.preventDefault()});
@@ -475,14 +591,15 @@ function avatar(x,y,r,em,col){
 }
 function actionText(s){return ING[s.id]?'加'+ING[s.id][1]:TRAPS[s.id]?(DIFFS[diff].flag?'⚠️ 陷阱！':'加'+TRAPS[s.id].n):s.id==='sugar'?'加糖 +1級':s.id==='ice'?'加冰 +1級':s.id==='shaker'?'搖！':'交件'}
 function draw(){
- ctx.clearRect(0,0,W,H);ctx.fillStyle='#FFF9EE';ctx.fillRect(0,0,W,H);
+ ctx.clearRect(0,0,W,H);ctx.save();if(shakeT>0)ctx.translate((Math.random()-.5)*5,(Math.random()-.5)*5);
+ ctx.fillStyle='#FFF9EE';ctx.fillRect(-10,-10,W+20,H+20);
  ctx.strokeStyle='rgba(150,110,80,.08)';ctx.lineWidth=1;
  for(let i=0;i<=W;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,H);ctx.stroke()}
  for(let j=0;j<=H;j+=40){ctx.beginPath();ctx.moveTo(0,j);ctx.lineTo(W,j);ctx.stroke()}
  const nr=near();
  STATIONS.forEach(s=>{
   const flag=!!TRAPS[s.id]&&DIFFS[diff].flag,isNear=nr&&nr.id===s.id;
-  ctx.beginPath();ctx.arc(s.x,s.y,22,0,7);ctx.fillStyle=s.c;ctx.fill();
+  ctx.beginPath();ctx.arc(s.x,s.y,22+(pulse[s.id]||0)*6,0,7);ctx.fillStyle=s.c;ctx.fill();
   ctx.lineWidth=isNear?4:2;ctx.strokeStyle=isNear?'#FF8A3D':(flag?'#E5484D':'#4A2C1A');
   if(flag)ctx.setLineDash([4,3]);ctx.stroke();ctx.setLineDash([]);
   ctx.font='20px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#000';ctx.fillText(s.e,s.x,s.y+1);
@@ -493,6 +610,8 @@ function draw(){
  avatar(player.x,player.y,player.r,av.e,av.c);
  bubble(playerName.slice(0,6),player.x,player.y+player.r+14);
  if(nr)bubble(actionText(nr),Math.max(36,Math.min(W-36,player.x)),player.y-player.r-14);
+ floaters.forEach(f=>{ctx.globalAlpha=Math.max(0,Math.min(1,f.life*1.6));ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineWidth=3;ctx.strokeStyle='#fff';ctx.strokeText(f.t,f.x,f.y);ctx.fillStyle=f.col;ctx.fillText(f.t,f.x,f.y);ctx.globalAlpha=1});
+ ctx.restore();
  const tl=Math.max(0,timeLeft),fr=Math.min(1,tl/startTime);
  ctx.fillStyle='rgba(74,44,26,.14)';ctx.fillRect(0,0,W,14);
  ctx.fillStyle=tl<=10?'#FF7A7A':'#8FD49A';ctx.fillRect(0,0,W*fr,14);
@@ -505,7 +624,10 @@ function loop(t){
   let dx=0,dy=0;
   if(keys.arrowup||keys.w)dy--;if(keys.arrowdown||keys.s)dy++;if(keys.arrowleft||keys.a)dx--;if(keys.arrowright||keys.d)dx++;
   dx+=joyVec.x;dy+=joyVec.y;const len=Math.hypot(dx,dy),sp=2.2*(1+.06*lv('fastFeet'))*60*dt;
-  if(len>.12){const m=Math.min(1,len);player.x+=dx/len*sp*m;player.y+=dy/len*sp*m}
+  const tx=len>.12?dx/len*Math.min(1,len):0,ty=len>.12?dy/len*Math.min(1,len):0,kk=Math.min(1,dt*16);
+  vx+=(tx-vx)*kk;vy+=(ty-vy)*kk;player.x+=vx*sp;player.y+=vy*sp;
+  floaters.forEach(f=>{f.life-=dt;f.y-=30*dt});floaters=floaters.filter(f=>f.life>0);
+  Object.keys(pulse).forEach(k=>{pulse[k]-=dt*4;if(pulse[k]<=0)delete pulse[k]});shakeT=Math.max(0,shakeT-dt);
   player.x=Math.max(player.r,Math.min(W-player.r,player.x));player.y=Math.max(player.r,Math.min(H-player.r,player.y));
   updateAI(dt);draw();renderLB();
  }
@@ -522,14 +644,14 @@ function startGame(){
  const D=DIFFS[diff];
  deliveries=0;score=0;combo=lv('headStart');order=null;resetCup();
  timeLeft=D.time+3*lv('moreTime');startTime=timeLeft;maxTime=timeLeft+30;
- player.x=160;player.y=305;keys={};buildStations();joyVec.x=joyVec.y=0;initAI();newOrder();
+ player.x=160;player.y=305;keys={};vx=vy=0;floaters=[];pulse={};shakeT=0;buildStations();joyVec.x=joyVec.y=0;initAI();newOrder();
  el('scoreChip').textContent=0;el('comboChip').textContent='x'+combo;el('comboChip').classList.remove('hot');showTime();
  el('rmBtn').style.display=D.rm?'block':'none';el('rmBtn').textContent=D.rm;
  playing=true;updPower();
  el('startOverlay').classList.add('hidden');document.body.classList.add('playing');el('gameWrap').style.display='flex';
  fit();requestAnimationFrame(fit);
  clearInterval(timerId);
- timerId=setInterval(()=>{timeLeft--;showTime();if(timeLeft<=0){clearInterval(timerId);endGame()}},1000);
+ timerId=setInterval(()=>{timeLeft--;showTime();if(timeLeft<=10&&timeLeft>0)SFX.tick();if(timeLeft<=0){clearInterval(timerId);endGame()}},1000);
 }
 async function endGame(){
  playing=false;gameOverOnce=true;joyEnd();updPower();
@@ -539,20 +661,14 @@ async function endGame(){
  el('lbTop10').innerHTML='載入排行榜中…';
  el('startPanel').style.display='none';el('shopPanel').style.display='none';el('endPanel').style.display='block';
  el('startOverlay').classList.remove('hidden');
- let handled=false,note='';
- if(FIREBASE_PROJECT_ID){
-  if(await fbAddScore(playerName,score,diff,av.e)){const top=await fbGetTop10();if(top){renderTop10(top,'🌐 全球排行榜（所有人共用）');handled=true}}
-  if(!handled)note='（雲端連線失敗，先存在此裝置）';
- }
- if(!handled){
-  localLB.push({name:playerName,score,diff,av:av.e});localLB.sort((a,b)=>b.score-a.score);localLB=localLB.slice(0,10);
-  try{localStorage.setItem('mtLeaderboard',JSON.stringify(localLB))}catch(e){}
-  renderTop10(localLB,'📍 排行榜（僅此裝置）'+note);
- }
+ const ok=await submitScore(),top=await fetchTop10();
+ localLB.push({name:playerName,score,diff,av:av.e});localLB.sort((a,b)=>b.score-a.score);localLB=localLB.slice(0,10);LS.set('mtLeaderboard',JSON.stringify(localLB));
+ if(top)renderTop10(top,'🌐 全球排行榜（每人最佳成績）',ok?'':(user?'⚠️ 你的成績上傳失敗（請確認 Firestore 規則）':'登入 Google 後，成績才能送上全球排行榜'));
+ else renderTop10(localLB,'📍 排行榜（僅此裝置）',auth?'（雲端連線失敗）':'');
 }
-el('startBtn').onclick=()=>{playerName=el('nickInput').value.trim()||('玩家'+Math.floor(Math.random()*900+100));startGame()};
+el('startBtn').onclick=()=>{ac();const n=el('nickInput').value.trim();playerName=n||('玩家'+Math.floor(Math.random()*900+100));if(n){LS.set('mtNick',n);schedulePush()}startGame()};
 el('restartBtn').onclick=()=>{el('endPanel').style.display='none';el('startPanel').style.display='block'};
-loadSave();renderDiff();renderAvatar();updPower();
+loadSave();renderDiff();renderAvatar();updPower();renderSnd();initFirebase();renderAcct();
 })();
 </script>
 </body>
