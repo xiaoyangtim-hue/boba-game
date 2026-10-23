@@ -103,6 +103,16 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
 @keyframes popin{0%{transform:scale(.6)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
 .pill.new{animation:popin .22s ease-out}
 .actbtn:active{filter:brightness(.92)}
+
+.mini{font-size:.76rem;color:var(--ink2);font-weight:700;margin:-2px 0 6px}
+.setgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;text-align:left;font-size:.74rem;font-weight:700}
+.setgrid select{width:100%;margin-top:2px;padding:6px;border:2px solid var(--ink);border-radius:10px;background:#fff;font-family:inherit;font-size:.8rem;color:var(--ink)}
+.setgrid select:disabled{background:#F4EEE2;opacity:.85}
+.code{font-weight:900;font-size:2.2rem;letter-spacing:.35rem;color:var(--orange);text-shadow:1px 2px 0 var(--ink);margin:2px 0 6px}
+.rk{display:flex;justify-content:space-between;gap:6px;padding:3px 2px;border-bottom:1px dashed var(--line)}
+.rk.me{background:#FFF1C9;font-weight:900;border-radius:6px}
+.rk span{white-space:nowrap;color:var(--ink2)}
+#countdown{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:5rem;font-weight:900;color:var(--orange);text-shadow:3px 4px 0 var(--ink);pointer-events:none;z-index:5}
 </style>
 </head>
 <body>
@@ -186,6 +196,17 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
     <li>場上兩位 🤖 AI 只是陪你比分數，會自己慢慢累積業績，不會影響你的得分；畫面下方的即時排行榜可以看誰領先。</li>
     <li>結束後成績會進前十名排行榜（目前只存在這個裝置，雲端共用版需要另外設定）。</li></ul>
    </div></details>
+   <details><summary>🏆 排行榜</summary><div class="rb">
+    <ul><li>開場和結算畫面都有「🏆 排行榜」，分成兩種：<b>最高紀錄</b>（單局最高分）和<b>累積金幣</b>（從第一局開始總共賺到的金幣，花掉也不會減少）。</li>
+    <li>兩種榜都只有登入 Google 的玩家會上榜，每人一筆；自己的那一行會標成黃色。</li></ul>
+   </div></details>
+   <details><summary>🌐 連線對戰（自訂房間）</summary><div class="rb">
+    <ul><li>按「連線對戰」→ 登入 Google → <b>建立房間</b>，會得到 5 碼房間代碼，按「邀請朋友」傳給他們；朋友輸入代碼就能加入。</li>
+    <li>房主可以自訂：難度、時間（30～180 秒）、陷阱開關、VIP 出現頻率、完美加時開關、商店升級開關、人數上限。開始前都能改。</li>
+    <li>房主按「開始遊戲」後全員倒數 3 秒同時開始，<b>每個人拿到的訂單和地圖都一模一樣</b>，上方即時顯示大家的分數。</li>
+    <li>全員結束後顯示排名，房主可以「再玩一局」。房間內的成績不計入金幣和全球排行榜，純粹跟朋友比賽。</li>
+    <li>預設禁用商店升級（大家公平比），房主可改成允許。</li></ul>
+   </div></details>
    <details><summary>☁️ 登入與雲端存檔</summary><div class="rb">
     <ul><li>按「Google 登入」後，金幣、商店升級、頭像、難度和暱稱會自動存到雲端，換手機或電腦登入同一個帳號就能接著玩。</li>
     <li>只有登入後，成績才會送上<b>全球排行榜</b>（每人只留最佳成績）。沒登入也能玩，進度只存在這個裝置。</li>
@@ -204,9 +225,12 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
   <div class="diff" id="diffRow"><button data-d="easy" class="easy">簡單</button><button data-d="normal" class="normal">中等</button><button data-d="hard" class="hard">困難</button></div>
   <p class="diffdesc" id="diffDesc"></p>
   <div class="coinline">🪙 金幣：<span id="coinDisplay">0</span></div>
+  <div class="mini" id="myStats"></div>
   <button class="smallbtn alt" id="sndBtn">🔊 音效與震動：開</button>
   <input class="nick" id="nickInput" maxlength="10" placeholder="輸入你的暱稱">
   <button class="bigbtn go" id="startBtn">開始上工</button>
+  <button class="bigbtn alt" id="roomBtn">🌐 連線對戰（自訂房間）</button>
+  <button class="bigbtn alt" id="rankBtn">🏆 排行榜</button>
   <button class="bigbtn alt" id="shopBtnStart">🛍️ 商店</button>
  </div>
  <div class="panel" id="shopPanel" style="display:none">
@@ -221,7 +245,48 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
   <div class="acct"><span id="acctText2"></span><button class="smallbtn" id="loginBtn2">Google 登入</button></div>
   <div class="lbbox" id="lbTop10"></div>
   <button class="bigbtn go" id="restartBtn">再上工一次</button>
+  <button class="bigbtn alt" id="endRankBtn">🏆 看排行榜</button>
   <button class="bigbtn alt" id="endShopBtn">🛍️ 商店</button>
+ </div>
+ <div class="panel" id="rankPanel" style="display:none">
+  <h2>🏆 排行榜</h2>
+  <div class="diff" id="rankTabs"><button data-t="score" class="normal sel">🏅 最高紀錄</button><button data-t="coins" class="normal">🪙 累積金幣</button></div>
+  <div class="lbbox" id="rankList" style="max-height:340px;margin-top:10px;font-size:.82rem">載入中…</div>
+  <div class="acct"><span id="acctText4"></span><button class="smallbtn" id="loginBtn4">Google 登入</button></div>
+  <button class="backlink" id="rankBack">← 返回</button>
+ </div>
+ <div class="panel" id="roomPanel" style="display:none">
+  <h2>🌐 連線對戰</h2>
+  <p class="diffdesc">和朋友在同一個房間同時挑戰，比誰的業績高！需要先用 Google 登入。</p>
+  <div class="acct"><span id="acctText3"></span><button class="smallbtn" id="loginBtn3">Google 登入</button></div>
+  <div class="sec">加入房間</div>
+  <input class="nick" id="joinCode" maxlength="6" placeholder="輸入房間代碼" autocapitalize="characters" style="text-transform:uppercase">
+  <button class="bigbtn go" id="joinBtn">加入房間</button>
+  <div class="sec">建立房間（自訂規則，你是房主）</div>
+  <div class="setgrid" id="createSet"></div>
+  <button class="bigbtn alt" id="createBtn" style="margin-top:10px">建立房間</button>
+  <p class="diffdesc" id="roomMsg"></p>
+  <button class="backlink" id="roomBack">← 返回</button>
+ </div>
+ <div class="panel" id="lobbyPanel" style="display:none">
+  <h2>🏠 等候室</h2>
+  <div style="font-size:.76rem;color:var(--ink2)">房間代碼</div>
+  <div class="code" id="lobbyCode">-----</div>
+  <button class="smallbtn" id="copyBtn">📋 邀請朋友</button>
+  <div class="sec">玩家 <span id="lobbyCount"></span></div>
+  <div class="lbbox" id="lobbyPlayers"></div>
+  <div class="sec">房間規則 <span id="setHint" style="font-weight:500;color:var(--ink2)"></span></div>
+  <div class="setgrid" id="lobbySet"></div>
+  <button class="bigbtn go" id="startRoomBtn" style="margin-top:10px">開始遊戲</button>
+  <p class="diffdesc" id="lobbyMsg"></p>
+  <button class="backlink" id="leaveBtn">離開房間</button>
+ </div>
+ <div class="panel" id="roomEndPanel" style="display:none">
+  <h2>🏁 對戰結果</h2>
+  <div style="font-size:.8rem;color:var(--ink2)" id="reMsg"></div>
+  <div class="lbbox" id="reList"></div>
+  <button class="bigbtn go" id="againBtn">再玩一局</button>
+  <button class="bigbtn alt" id="reLeaveBtn">離開房間</button>
  </div>
 </div>
 
@@ -231,7 +296,7 @@ canvas{display:block;border:2px solid var(--ink);border-radius:14px;background:#
   <div class="chip" id="comboChip">x0</div><button class="power" id="powerBtn">🪙+10秒(30)</button>
  </div>
  <div class="ordercard" id="orderCard"></div>
- <div class="cwrap" id="cwrap"><canvas id="canvas"></canvas><div class="hint" id="hint"></div><div class="jbase" id="jBase"><div class="jknob" id="jKnob"></div></div></div>
+ <div class="cwrap" id="cwrap"><canvas id="canvas"></canvas><div class="hint" id="hint"></div><div id="countdown"></div><div class="jbase" id="jBase"><div class="jknob" id="jKnob"></div></div></div>
  <div class="infobar"><div class="cupbar" id="cupBar"></div><div class="lblive" id="lbLive"></div></div>
  <div class="btns"><button class="actbtn rm" id="rmBtn">➖取出</button><button class="actbtn dis" id="discardBtn">🗑 整杯丟棄</button><button class="actbtn go" id="actBtn">👆 互動</button></div>
 </div>
@@ -282,8 +347,8 @@ const SHOP_ITEMS=[
 ];
 const AV_EMOJI=['🧑‍🍳','👩‍🍳','👨‍🍳','🐱','🐶','🐰','🦊','🐼','🐸','🐻','🐯','🦄'];
 const AV_COLOR=['#FF8A3D','#FF7A93','#5DB36B','#4DA3FF','#B98CFF','#FFC24B'];
-let coins=0,upgrades={},diff='normal',playerName='玩家',gameOverOnce=false,av={e:'🧑‍🍳',c:'#FF8A3D'};
-const lv=id=>{const v=upgrades[id];return v===true?1:Math.max(0,parseInt(v||0,10)||0)};
+let coins=0,upgrades={},diff='normal',playerName='玩家',gameOverOnce=false,av={e:'🧑‍🍳',c:'#FF8A3D'},room=null,totalEarned=0,bestScore=0;
+const lv=id=>{if(room&&!room.settings.upgrades)return 0;const v=upgrades[id];return v===true?1:Math.max(0,parseInt(v||0,10)||0)};
 const powerCost=()=>30-5*lv('powerDisc'),reach=()=>32+3*lv('reach');
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function g1(s){s=(s||'').trim();if(!s)return'';try{for(const x of new Intl.Segmenter(undefined,{granularity:'grapheme'}).segment(s))return x.segment}catch(e){}return Array.from(s)[0]||''}
@@ -293,9 +358,11 @@ function loadSave(){
  try{const d=localStorage.getItem('mtDiff');if(DIFFS[d])diff=d}catch(e){}
  try{const a=JSON.parse(localStorage.getItem('mtAvatar')||'null');if(a&&a.e&&a.c)av=a}catch(e){}
  try{const n=localStorage.getItem('mtNick');if(n)el('nickInput').value=n}catch(e){}
+ try{totalEarned=parseInt(localStorage.getItem('mtTotal')||'0',10)||0;bestScore=parseInt(localStorage.getItem('mtBest')||'0',10)||0}catch(e){}
+ if(totalEarned<coins)totalEarned=coins;
  showCoins();
 }
-function showCoins(){el('coinDisplay').textContent=coins;el('coinDisplay2').textContent=coins}
+function showCoins(){el('coinDisplay').textContent=coins;el('coinDisplay2').textContent=coins;const m=el('myStats');if(m)m.textContent=`🏅 最高紀錄 ${bestScore} 分　🪙 累積獲得 ${totalEarned}`}
 function saveCoins(){try{localStorage.setItem('mtCoins',String(coins))}catch(e){}showCoins();updPower();schedulePush()}
 function saveUpg(){try{localStorage.setItem('mtUpgrades',JSON.stringify(upgrades))}catch(e){}schedulePush()}
 
@@ -337,8 +404,8 @@ try{localLB=JSON.parse(LS.get('mtLeaderboard')||'[]')}catch(e){}
 function renderAcct(){
  const on=!!user,name=on?esc((user.displayName||user.email||'玩家').slice(0,16)):'';
  const txt=on?`☁️ 已登入：${name}${cloudMsg?'　'+cloudMsg:''}`:(auth?'☁️ 尚未登入：進度只存在這個裝置':'📴 目前無法連線雲端（請用你自己的網址開啟）');
- ['acctText','acctText2'].forEach(id=>el(id).innerHTML=txt);
- ['loginBtn','loginBtn2'].forEach(id=>{const b=el(id);b.style.display=auth?'inline-block':'none';b.textContent=on?'登出':'Google 登入';b.onclick=on?logout:login});
+ ['acctText','acctText2','acctText3','acctText4'].forEach(id=>el(id).innerHTML=txt);
+ ['loginBtn','loginBtn2','loginBtn3','loginBtn4'].forEach(id=>{const b=el(id);b.style.display=auth?'inline-block':'none';b.textContent=on?'登出':'Google 登入';b.onclick=on?logout:login});
 }
 function initFirebase(){
  if(typeof firebase==='undefined')return;
@@ -358,12 +425,12 @@ function logout(){if(auth)auth.signOut()}
 function schedulePush(){LS.set('mtDirty','1');if(!user||!fdb)return;clearTimeout(pushT);pushT=setTimeout(pushCloud,1200)}
 async function pushCloud(){
  if(!user||!fdb)return;const t=Date.now();
- try{await fdb.collection('players').doc(user.uid).set({coins,upgrades,av,diff,nick:el('nickInput').value.slice(0,10),updatedAt:t});LS.set('mtDirty','0');LS.set('mtSyncedAt',String(t));cloudMsg='✅ 已同步'}
+ try{await fdb.collection('players').doc(user.uid).set({coins,upgrades,av,diff,totalEarned,best:bestScore,nick:el('nickInput').value.slice(0,10),updatedAt:t});LS.set('mtDirty','0');LS.set('mtSyncedAt',String(t));cloudMsg='✅ 已同步'}
  catch(e){cloudMsg='⚠️ 存檔同步失敗'}
  renderAcct();
 }
 function applyCloud(d){
- coins=d.coins|0;upgrades=d.upgrades||{};
+ coins=d.coins|0;upgrades=d.upgrades||{};totalEarned=Math.max(d.totalEarned|0,coins);bestScore=Math.max(bestScore,d.best|0);LS.set('mtTotal',String(totalEarned));LS.set('mtBest',String(bestScore));
  if(d.av&&d.av.e&&d.av.c)av=d.av;
  if(DIFFS[d.diff])diff=d.diff;
  if(d.nick){el('nickInput').value=d.nick;LS.set('mtNick',d.nick)}
@@ -386,26 +453,29 @@ async function onAuth(u){
    }else if(dirty)await pushCloud();
   }else await pushCloud();
   cloudMsg='✅ 已同步';
+  if(bestScore>0||totalEarned>0)submitBoard(bestScore,diff);
  }catch(e){cloudMsg='⚠️ 存檔同步失敗（請確認 Firestore 規則）'}
  renderAcct();
 }
-async function submitScore(){
+async function submitBoard(sc,d){
  if(!user||!fdb)return false;
  try{
-  const ref=fdb.collection('scores').doc(user.uid),s=await ref.get();
-  if(!s.exists||score>(s.data().score||0))await ref.set({uid:user.uid,name:playerName.slice(0,20),score,diff,av:av.e,ts:Date.now()});
+  const ref=fdb.collection('scores').doc(user.uid),s=await ref.get(),old=s.exists?s.data():{};
+  await ref.set({uid:user.uid,name:myName(),score:Math.max(old.score||0,sc),diff:sc>(old.score||0)?d:(old.diff||d),av:av.e,totalCoins:Math.max(old.totalCoins||0,totalEarned),ts:Date.now()});
   return true;
  }catch(e){return false}
 }
-async function fetchTop10(){
+const submitScore=()=>submitBoard(score,diff);
+async function fetchBoard(field,n){
  try{
-  if(fdb){const s=await fdb.collection('scores').orderBy('score','desc').limit(10).get();return s.docs.map(d=>d.data())}
-  const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:'scores'}],orderBy:[{field:{fieldPath:'score'},direction:'DESCENDING'}],limit:10}})});
+  if(fdb){const s=await fdb.collection('scores').orderBy(field,'desc').limit(n).get();return s.docs.map(d=>d.data())}
+  const r=await fetch(`https://firestore.googleapis.com/v1/projects/${FIREBASE_CONFIG.projectId}/databases/(default)/documents:runQuery`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({structuredQuery:{from:[{collectionId:'scores'}],orderBy:[{field:{fieldPath:field},direction:'DESCENDING'}],limit:n}})});
   if(!r.ok)return null;
-  return(await r.json()).filter(d=>d.document&&d.document.fields).map(d=>{const f=d.document.fields;
-   return{name:(f.name&&f.name.stringValue)||'?',score:parseInt((f.score&&f.score.integerValue)||'0',10),diff:(f.diff&&f.diff.stringValue)||'',av:(f.av&&f.av.stringValue)||''}});
+  const iv=f=>parseInt((f&&f.integerValue)||'0',10),sv=f=>(f&&f.stringValue)||'';
+  return(await r.json()).filter(d=>d.document&&d.document.fields).map(d=>{const f=d.document.fields;return{uid:sv(f.uid),name:sv(f.name)||'?',score:iv(f.score),totalCoins:iv(f.totalCoins),diff:sv(f.diff),av:sv(f.av)}});
  }catch(e){return null}
 }
+const fetchTop10=()=>fetchBoard('score',10);
 function renderTop10(list,label,note){
  const rows=(list&&list.length)?list.slice(0,10).map((r,i)=>`#${i+1} ${esc(r.av||'')} ${esc(r.name)} — ${r.score} 分${DIFFS[r.diff]?' ['+DIFFS[r.diff].label+']':''}`).join('<br>'):'還沒有紀錄';
  el('lbTop10').innerHTML=`<b>${label}</b><br>${rows}${note?'<br><span style="color:var(--ink2)">'+note+'</span>':''}`;
@@ -438,10 +508,11 @@ function resetCup(){cup={sugar:0,ice:0,shakes:0};ING_KEYS.concat(TRAP_KEYS).forE
 function shakeOk(){const n=order.shakes;return cup.shakes>=n&&(diff!=='hard'||cup.shakes<=n+2)}
 const hasMat=()=>ING_KEYS.concat(TRAP_KEYS).some(k=>cup[k]>0)||cup.sugar>0||cup.ice>0;
 function newOrder(){
- const D=DIFFS[diff],m=pick(MENU.filter(x=>D.tiers.includes(x.t)));
+ const R=room?mulberry32(hashStr(room.code+':'+(room.round||1)+':'+deliveries)):Math.random,pk=a=>a[Math.floor(R()*a.length)];
+ const D=DIFFS[diff],m=pk(MENU.filter(x=>D.tiers.includes(x.t))),vipE=room?room.settings.vipEvery:5;
  order={m,r:Object.assign(Object.fromEntries(ING_KEYS.map(k=>[k,0])),m.r),
-  sugar:pick(diff==='easy'?[0,2,4]:[0,1,2,3,4]),ice:pick(diff==='easy'?[0,2,3]:[0,1,2,3]),
-  shakes:D.shake+Math.min(3,Math.floor(deliveries/3))+Math.floor(Math.random()*2),vip:deliveries>0&&deliveries%5===0};
+  sugar:pk(diff==='easy'?[0,2,4]:[0,1,2,3,4]),ice:pk(diff==='easy'?[0,2,3]:[0,1,2,3]),
+  shakes:D.shake+Math.min(3,Math.floor(deliveries/3))+Math.floor(R()*2),vip:vipE>0&&deliveries>0&&deliveries%vipE===0};
  prevOk=new Set();renderOrder();
 }
 const pill=(t,c)=>{if(c==='ok'){curOk.add(t);return `<span class="pill ok${prevOk.has(t)?'':' new'}">${t}</span>`}return `<span class="pill ${c}">${t}</span>`};
@@ -515,7 +586,7 @@ function deliver(){
   tb=D.bonus+(order.vip?2:0)+.5*lv('timeBonus');msg=`⚡完美出餐 +${gained}　⏱+${+tb.toFixed(1)}秒`;
  }else if(cnt/total>=.6){combo=0;gained=Math.round(cnt*3*vm*um*D.mult);tb=1;msg=`${cnt}/${total} 正確 +${gained}`}
  else{combo=0;gained=-5;msg=`❌太馬虎了 ${gained}`}
- score=Math.max(0,score+gained);timeLeft=Math.min(maxTime,timeLeft+tb);deliveries++;
+ score=Math.max(0,score+gained);if(room&&!room.settings.bonus)tb=0;timeLeft=Math.min(maxTime,timeLeft+tb);deliveries++;if(room)schedRoomPush();
  el('scoreChip').textContent=score;el('comboChip').textContent='x'+combo;el('comboChip').classList.toggle('hot',combo>0&&combo%5===0);
  const cs=STATIONS.find(x=>x.id==='counter');
  if(trapped||gained<0){SFX.bad();vib([60,40,60]);shakeT=.25;pop(String(gained),cs.x,cs.y-28,'#E5484D')}
@@ -523,18 +594,21 @@ function deliver(){
  else{SFX.ok();vib(20);pop('+'+gained,cs.x,cs.y-28,'#B36A00')}
  flash(msg);showTime();resetCup();newOrder();bump('orderCard');
 }
-function updPower(){const b=el('powerBtn');b.textContent=`🪙+10秒(${powerCost()})`;b.disabled=!playing||coins<powerCost()}
+function updPower(){const b=el('powerBtn');b.style.display=(room&&!room.settings.upgrades)?'none':'';b.textContent=`🪙+10秒(${powerCost()})`;b.disabled=!playing||coins<powerCost()}
 el('powerBtn').onclick=()=>{const c=powerCost();if(!playing||coins<c)return;coins-=c;timeLeft=Math.min(maxTime,timeLeft+10);saveCoins();showTime();flash('🪙 +10 秒！')};
 
 // ---- AI ----
-function initAI(){ai=[{name:'AI-阿貓',x:80,y:100,vx:1,vy:.6,score:0,next:2+Math.random()*3},{name:'AI-阿狗',x:240,y:290,vx:-.8,vy:1,score:0,next:2+Math.random()*3}]}
+function initAI(){ai=room?[]:[{name:'AI-阿貓',x:80,y:100,vx:1,vy:.6,score:0,next:2+Math.random()*3},{name:'AI-阿狗',x:240,y:290,vx:-.8,vy:1,score:0,next:2+Math.random()*3}]}
 function updateAI(dt){
  ai.forEach(b=>{b.x+=b.vx*dt*40;b.y+=b.vy*dt*40;if(b.x<16||b.x>W-16)b.vx*=-1;if(b.y<16||b.y>H-16)b.vy*=-1;
   b.next-=dt;if(b.next<=0){b.score+=Math.round((5+Math.random()*20)*DIFFS[diff].ai);b.next=2.5+Math.random()*3.5}});
 }
 function renderLB(){
- const rows=[{n:av.e+' 你',s:score},...ai.map(b=>({n:'🤖 '+b.name.replace('AI-',''),s:b.score}))].sort((a,b)=>b.s-a.s);
- el('lbLive').innerHTML='🏆 即時<br>'+rows.map(r=>`${esc(r.n)} ${r.s}`).join('<br>');
+ let rows;
+ if(room)rows=roomPlayers.map(p=>({n:(user&&p.id===user.uid?'⭐':(p.av||''))+' '+String(p.name||'?').slice(0,5),s:(user&&p.id===user.uid)?score:(p.score||0)}));
+ else rows=[{n:av.e+' 你',s:score},...ai.map(b=>({n:'🤖 '+b.name.replace('AI-',''),s:b.score}))];
+ rows.sort((a,b)=>b.s-a.s);
+ el('lbLive').innerHTML='🏆 即時<br>'+rows.slice(0,4).map(r=>`${esc(r.n)} ${r.s}`).join('<br>');
 }
 
 // ---- 輸入：鍵盤 / 浮動搖桿（手指按在地圖任何地方就出現）----
@@ -635,26 +709,187 @@ function loop(t){
 }
 requestAnimationFrame(loop);
 
+// ---- 連線對戰：自訂房間（Firestore 即時同步）----
+const SET_DEF={diff:'normal',time:60,traps:true,bonus:true,vipEvery:5,upgrades:false,max:4};
+const SET_FIELDS=[
+ {k:'diff',n:'難度',o:[['easy','簡單'],['normal','中等'],['hard','困難']]},
+ {k:'time',n:'時間',o:[30,45,60,75,90,120,150,180].map(v=>[v,v+' 秒'])},
+ {k:'traps',n:'陷阱材料',o:[[true,'開'],[false,'關']]},
+ {k:'vipEvery',n:'VIP 訂單',o:[[0,'不出現'],[3,'每 3 杯'],[5,'每 5 杯'],[8,'每 8 杯']]},
+ {k:'bonus',n:'完美加時',o:[[true,'開'],[false,'關']]},
+ {k:'upgrades',n:'商店升級',o:[[false,'禁用（公平）'],[true,'允許']]},
+ {k:'max',n:'人數上限',o:[2,3,4,6,8].map(v=>[v,v+' 人'])}
+];
+function setForm(box,s,editable,onChange){
+ box.innerHTML=SET_FIELDS.map(f=>`<label>${f.n}<select data-k="${f.k}" ${editable?'':'disabled'}>${f.o.map(([v,t])=>`<option value="${v}" ${String(s[f.k])===String(v)?'selected':''}>${t}</option>`).join('')}</select></label>`).join('');
+ if(editable)box.querySelectorAll('select').forEach(sel=>sel.onchange=()=>{const f=SET_FIELDS.find(x=>x.k===sel.dataset.k);s[f.k]=f.o.find(([v])=>String(v)===sel.value)[0];if(onChange)onChange(s)});
+}
+let roomUnsubs=[],roomPlayers=[],draft=Object.assign({},SET_DEF),roomPushT=null,graceT=null,myEndAt=0,starting=false,lastSetJSON='',rankTab='score';
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function shuffleR(arr,R){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(R()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const myName=()=>(el('nickInput').value.trim()||(user&&user.displayName)||'玩家').slice(0,10);
+const PANELS=['startPanel','shopPanel','endPanel','rankPanel','roomPanel','lobbyPanel','roomEndPanel'];
+function showPanel(id){PANELS.forEach(p=>el(p).style.display=p===id?'block':'none');el('startOverlay').classList.remove('hidden')}
+const ROOM_CHARS='ABCDEFGHJKMNPQRSTUVWXYZ23456789',rRef=c=>fdb.collection('rooms').doc(c),roomMsg=t=>{el('roomMsg').textContent=t};
+const myRoomDoc=()=>({uid:user.uid,name:myName(),av:av.e,score:0,combo:0,deliveries:0,done:false,updatedAt:Date.now()});
+async function createRoom(){
+ if(!user||!fdb){roomMsg('請先用 Google 登入');return}
+ roomMsg('建立中…');
+ for(let i=0;i<6;i++){
+  const code=Array.from({length:5},()=>ROOM_CHARS[Math.floor(Math.random()*ROOM_CHARS.length)]).join('');
+  try{
+   const ref=rRef(code),s=await ref.get();if(s.exists)continue;
+   await ref.set({code,hostUid:user.uid,hostName:myName(),status:'lobby',round:1,settings:Object.assign({},draft),createdAt:Date.now()});
+   await ref.collection('players').doc(user.uid).set(myRoomDoc());
+   enterRoom(code,true);return;
+  }catch(e){roomMsg('建立失敗：請確認 Firestore 規則已更新');return}
+ }
+ roomMsg('建立失敗，請再試一次');
+}
+async function joinRoom(){
+ if(!user||!fdb){roomMsg('請先用 Google 登入');return}
+ const code=el('joinCode').value.trim().toUpperCase();if(code.length<4){roomMsg('請輸入房間代碼');return}
+ roomMsg('加入中…');
+ try{
+  const s=await rRef(code).get();
+  if(!s.exists){roomMsg('找不到這個房間，請確認代碼');return}
+  const r=s.data();
+  if(r.status==='closed'||Date.now()-(r.createdAt||0)>12*3600e3){roomMsg('這個房間已經關閉');return}
+  if(r.status!=='lobby'){roomMsg('遊戲已經開始，無法中途加入');return}
+  const ps=await rRef(code).collection('players').get();
+  if(ps.docs.length>=((r.settings&&r.settings.max)||4)&&!ps.docs.some(d=>d.id===user.uid)){roomMsg('房間已滿');return}
+  await rRef(code).collection('players').doc(user.uid).set(myRoomDoc());
+  enterRoom(code,r.hostUid===user.uid);
+ }catch(e){roomMsg('加入失敗：請確認 Firestore 規則已更新')}
+}
+function leaveListeners(){roomUnsubs.forEach(u=>{try{u()}catch(e){}});roomUnsubs=[]}
+function enterRoom(code,isHost){
+ leaveListeners();roomPlayers=[];lastSetJSON='';
+ room={code,isHost,settings:Object.assign({},SET_DEF),status:'lobby',round:1,hostUid:isHost?user.uid:null};
+ roomUnsubs=[
+  rRef(code).onSnapshot(onRoomSnap,()=>{}),
+  rRef(code).collection('players').onSnapshot(s=>{roomPlayers=s.docs.map(d=>Object.assign({id:d.id},d.data()));renderLobby();renderRoomEnd()},()=>{})
+ ];
+ showPanel('lobbyPanel');renderLobby();
+}
+function onRoomSnap(snap){
+ if(!room)return;
+ if(!snap.exists){leaveRoom(true,'房間已不存在');return}
+ const d=snap.data(),prev=room.status;
+ room.settings=Object.assign({},SET_DEF,d.settings);room.status=d.status;room.round=d.round||1;room.hostUid=d.hostUid;room.isHost=!!user&&d.hostUid===user.uid;
+ if(d.status==='closed'){leaveRoom(true,'房主已關閉房間');return}
+ if(d.status==='playing'&&prev!=='playing'&&!playing&&!starting)startRoomGame();
+ else if(d.status==='lobby'&&prev==='playing')backToLobby();
+ renderLobby();renderRoomEnd();
+}
+function renderLobby(){
+ if(!room||el('lobbyPanel').style.display==='none')return;
+ el('lobbyCode').textContent=room.code;
+ el('lobbyCount').textContent=`(${roomPlayers.length}/${room.settings.max})`;
+ el('lobbyPlayers').innerHTML=roomPlayers.map(p=>`${esc(p.av||'')} ${esc(p.name||'?')}${p.id===room.hostUid?' 👑':''}${user&&p.id===user.uid?'（你）':''}`).join('<br>')||'…';
+ const js=JSON.stringify(room.settings)+room.isHost;
+ if(js!==lastSetJSON){lastSetJSON=js;setForm(el('lobbySet'),Object.assign({},room.settings),room.isHost,s=>{rRef(room.code).update({settings:s}).catch(()=>{})})}
+ el('setHint').textContent=room.isHost?'（房主可修改）':'（由房主設定）';
+ el('startRoomBtn').style.display=room.isHost?'block':'none';
+ el('lobbyMsg').textContent=room.isHost?(roomPlayers.length<2?'把代碼傳給朋友；也可以先一個人開始':''):'等待房主開始遊戲…';
+}
+function startRoomGame(){
+ starting=true;diff=room.settings.diff;playerName=myName();
+ prepGame();runCountdown(3,()=>{starting=false;if(room)beginGame()});
+}
+function runCountdown(n,cb){
+ const c=el('countdown');c.style.display='flex';let i=n;
+ const tick=()=>{if(!room&&!playing&&!starting)return;if(i>0){c.textContent=i;SFX.tick();i--;setTimeout(tick,800)}else{c.textContent='GO!';SFX.ok();setTimeout(()=>{c.style.display='none';cb()},500)}};
+ tick();
+}
+function schedRoomPush(){clearTimeout(roomPushT);roomPushT=setTimeout(()=>roomPush(false),300)}
+async function roomPush(fin){
+ if(!room||!fdb||!user)return;
+ try{await rRef(room.code).collection('players').doc(user.uid).set({uid:user.uid,name:myName(),av:av.e,score,combo,deliveries,done:!!fin,updatedAt:Date.now()})}catch(e){}
+}
+function endRoomGame(){
+ playing=false;joyEnd();updPower();clearTimeout(roomPushT);
+ el('gameWrap').style.display='none';document.body.classList.remove('playing');
+ myEndAt=Date.now();roomPush(true);
+ showPanel('roomEndPanel');renderRoomEnd();
+ clearTimeout(graceT);graceT=setTimeout(renderRoomEnd,21000);
+}
+function renderRoomEnd(){
+ if(!room||el('roomEndPanel').style.display==='none')return;
+ const ps=roomPlayers.slice().sort((a,b)=>(b.score||0)-(a.score||0)),all=ps.length>0&&ps.every(p=>p.done),fin=all||(myEndAt&&Date.now()-myEndAt>20000);
+ el('reMsg').textContent=fin?'全部完成！':`等待其他玩家完成…（${ps.filter(p=>p.done).length}/${ps.length}）`;
+ el('reList').innerHTML=ps.map((p,i)=>`${['🥇','🥈','🥉'][i]||'#'+(i+1)} ${esc(p.av||'')} ${esc(p.name||'?')}${user&&p.id===user.uid?'（你）':''} — ${p.score||0} 分${p.done?'':' ⏳'}`).join('<br>');
+ el('againBtn').style.display=room.isHost?'block':'none';el('againBtn').disabled=!fin;
+}
+function backToLobby(){
+ clearTimeout(graceT);clearTimeout(roomPushT);
+ if(playing||starting){playing=false;starting=false;clearInterval(timerId);joyEnd();el('countdown').style.display='none';el('gameWrap').style.display='none';document.body.classList.remove('playing')}
+ if(fdb&&user&&room)rRef(room.code).collection('players').doc(user.uid).set(myRoomDoc()).catch(()=>{});
+ showPanel('lobbyPanel');lastSetJSON='';renderLobby();
+}
+async function leaveRoom(auto,msg){
+ const r=room;room=null;leaveListeners();clearTimeout(graceT);clearTimeout(roomPushT);
+ if(playing||starting){playing=false;starting=false;clearInterval(timerId);joyEnd();el('countdown').style.display='none';el('gameWrap').style.display='none';document.body.classList.remove('playing')}
+ const d=LS.get('mtDiff');if(DIFFS[d])diff=d;
+ try{if(r&&fdb&&user&&!auto){if(r.isHost)await rRef(r.code).update({status:'closed'});else await rRef(r.code).collection('players').doc(user.uid).delete()}}catch(e){}
+ renderDiff();updPower();showPanel('startPanel');
+ if(msg)alert(msg);
+}
+el('roomBtn').onclick=()=>{showPanel('roomPanel');setForm(el('createSet'),draft,true);roomMsg('');renderAcct()};
+el('roomBack').onclick=()=>showPanel('startPanel');
+el('createBtn').onclick=createRoom;el('joinBtn').onclick=joinRoom;
+el('startRoomBtn').onclick=async()=>{if(!room||!room.isHost)return;try{await rRef(room.code).update({status:'playing',startedAt:Date.now()})}catch(e){el('lobbyMsg').textContent='開始失敗，請再試一次'}};
+el('againBtn').onclick=async()=>{if(!room||!room.isHost)return;try{await rRef(room.code).update({status:'lobby',round:(room.round||1)+1})}catch(e){}};
+el('leaveBtn').onclick=()=>leaveRoom(false);el('reLeaveBtn').onclick=()=>leaveRoom(false);
+el('copyBtn').onclick=async()=>{
+ if(!room)return;const t=`來玩手搖飲挑戰.io！房間代碼：${room.code}\n${location.href.split('#')[0]}`;
+ try{if(navigator.share){await navigator.share({text:t});return}await navigator.clipboard.writeText(t);el('lobbyMsg').textContent='已複製，傳給朋友吧！'}catch(e){el('lobbyMsg').textContent='請手動告訴朋友代碼：'+room.code}
+};
+
+// ---- 排行榜（最高紀錄 / 累積金幣）----
+function renderRankTabs(){document.querySelectorAll('#rankTabs button').forEach(b=>b.classList.toggle('sel',b.dataset.t===rankTab))}
+async function openRank(){
+ showPanel('rankPanel');renderRankTabs();el('rankList').textContent='載入中…';renderAcct();
+ const field=rankTab==='coins'?'totalCoins':'score',list=await fetchBoard(field,20);
+ if(el('rankPanel').style.display==='none'||(rankTab==='coins'?'totalCoins':'score')!==field)return;
+ const box=el('rankList');
+ if(!list){box.innerHTML=`<b>📍 這台裝置</b><br>🏅 最高紀錄：${bestScore} 分<br>🪙 累積金幣：${totalEarned}<br><span style="color:var(--ink2)">${auth?'（雲端連線失敗）':'（無法連線雲端，請用你自己的網址開啟）'}</span>`;return}
+ if(!list.length){box.innerHTML='還沒有人上榜，快來當第一名！';return}
+ box.innerHTML=list.map((r,i)=>{const me=user&&r.uid===user.uid,v=field==='score'?`${r.score} 分${DIFFS[r.diff]?' ['+DIFFS[r.diff].label+']':''}`:`🪙 ${r.totalCoins||0}`;
+  return `<div class="rk${me?' me':''}"><b>${['🥇','🥈','🥉'][i]||'#'+(i+1)} ${esc(r.av||'')} ${esc(r.name)}</b><span>${v}</span></div>`}).join('')
+  +(user?'':'<div style="color:var(--ink2);margin-top:6px">登入 Google 後，你的成績也會出現在榜上</div>');
+}
+document.querySelectorAll('#rankTabs button').forEach(b=>b.onclick=()=>{rankTab=b.dataset.t;openRank()});
+el('rankBtn').onclick=openRank;el('endRankBtn').onclick=openRank;el('rankBack').onclick=()=>showPanel('startPanel');
+
 function buildStations(){
- const D=DIFFS[diff],slots=FREE_SLOTS.slice().sort(()=>Math.random()-.5);
- STATIONS=REAL_STATIONS.concat(D.traps.map((id,i)=>({id,x:slots[i][0],y:slots[i][1],e:TRAPS[id].e,n:TRAPS[id].n,c:TRAPS[id].c})));
+ const D=DIFFS[diff],R=room?mulberry32(hashStr(room.code+':'+(room.round||1)+':map')):Math.random;
+ const slots=shuffleR(FREE_SLOTS,R),traps=(room&&!room.settings.traps)?[]:D.traps;
+ STATIONS=REAL_STATIONS.concat(traps.map((id,i)=>({id,x:slots[i][0],y:slots[i][1],e:TRAPS[id].e,n:TRAPS[id].n,c:TRAPS[id].c})));
 }
 // ---- 流程 ----
-function startGame(){
+function prepGame(){
  const D=DIFFS[diff];
  deliveries=0;score=0;combo=lv('headStart');order=null;resetCup();
- timeLeft=D.time+3*lv('moreTime');startTime=timeLeft;maxTime=timeLeft+30;
+ timeLeft=(room?room.settings.time:D.time)+3*lv('moreTime');startTime=timeLeft;maxTime=timeLeft+30;
  player.x=160;player.y=305;keys={};vx=vy=0;floaters=[];pulse={};shakeT=0;buildStations();joyVec.x=joyVec.y=0;initAI();newOrder();
  el('scoreChip').textContent=0;el('comboChip').textContent='x'+combo;el('comboChip').classList.remove('hot');showTime();
  el('rmBtn').style.display=D.rm?'block':'none';el('rmBtn').textContent=D.rm;
- playing=true;updPower();
+ playing=false;updPower();
  el('startOverlay').classList.add('hidden');document.body.classList.add('playing');el('gameWrap').style.display='flex';
- fit();requestAnimationFrame(fit);
+ fit();requestAnimationFrame(()=>{fit();draw();renderLB()});
+}
+function beginGame(){
+ playing=true;updPower();
  clearInterval(timerId);
  timerId=setInterval(()=>{timeLeft--;showTime();if(timeLeft<=10&&timeLeft>0)SFX.tick();if(timeLeft<=0){clearInterval(timerId);endGame()}},1000);
 }
+function startGame(){prepGame();beginGame()}
 async function endGame(){
+ if(room){endRoomGame();return}
  playing=false;gameOverOnce=true;joyEnd();updPower();
+ totalEarned+=score;LS.set('mtTotal',String(totalEarned));if(score>bestScore){bestScore=score;LS.set('mtBest',String(bestScore))}
  coins+=score;saveCoins();
  el('gameWrap').style.display='none';document.body.classList.remove('playing');
  el('finalScore').textContent=score;el('coinGain').textContent=score;el('endDiff').textContent=DIFFS[diff].label;
